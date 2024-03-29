@@ -468,7 +468,12 @@ void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
         fprintf(file, "%d  ", i);
       }
       if (board[i][j].state.isMine == 1 && fog == 0) {
-        fprintf(file, "X  ");
+        if(board[i][j].state.isFlagged){
+          fprintf(file, "!  ");
+        }
+        else{
+          fprintf(file, "X  ");
+        }
       } else if (board[i][j].state.isFlagged == 1) {
         fprintf(file, "?  ");
       } else if (board[i][j].state.isRevealed == 0) {
