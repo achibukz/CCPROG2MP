@@ -1,7 +1,6 @@
 Achi 0
 Haerin 0
 Hyein 0
-<<<<<<< HEAD
 Paolo 0
 Danielle 0
 Minju 0
@@ -9,6 +8,3 @@ Minji 0
 Wonhee 0
 Iroha 0
 Moka 0
-=======
-Ryan 0
->>>>>>> 1311fd9ea36bdb3c3a3ab9e305fcc09ae3b0bbe5

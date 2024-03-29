@@ -41,7 +41,8 @@ void selProfile();
 void viewStat(string name);
 void cursorStart(FILE *file, string target);
 void profileChanger(Profile *profile, int type, int diff, int win);
-void delProfile(string name);
+void delProfile1(string filename, string name);
+void delProfile2(string filename, string name);
 void mainMenu(Profile *profile);
 void profile_mainMenu();
 void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,

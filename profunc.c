@@ -388,62 +388,81 @@ void profileChanger(Profile *profile, int type, int diff, int win){
   blank();
 }
 
-void delProfile(string name) {
-    Profile arr[10];
-    int i = 0;
-    int found = 0;
+void delProfile1(string filename, string name) {
+    string end;
+    sprintf(end, "%s End", name);
+    FILE *fp = fopen(filename, "r");
+    FILE *tempFile = fopen("temp.txt", "w");
+    char buffer[1024];
 
-    FILE *file = fopen("prof.txt", "r");
-    if (file == NULL) {
-        printf("Error opening file.\n");
+    if (!fp || !tempFile) {
+        printf("Error opening file!\n");
         return;
     }
 
-    char tempFileName[L_tmpnam];
-    tmpnam(tempFileName);
-
-    FILE *tempFile = fopen(tempFileName, "w");
-    if (tempFile == NULL) {
-        printf("Error creating temporary file.\n");
-        fclose(file);
-        return;
-    }
-
-    while (fscanf(file, "%s %d %d %d %d %d %d", arr[i].name, &arr[i].wonGame[0],
-                &arr[i].wonGame[1], &arr[i].wonGame[2], &arr[i].lostGame[0],
-                &arr[i].lostGame[1], &arr[i].lostGame[2]) != EOF) {
-        if (strcmp(arr[i].name, name) != 0) {
-            fprintf(tempFile, "%s %d %d %d %d %d %d\n", arr[i].name, arr[i].wonGame[0],
-                    arr[i].wonGame[1], arr[i].wonGame[2], arr[i].lostGame[0],
-                    arr[i].lostGame[1], arr[i].lostGame[2]);
-        } else {
-            found = 1;
+    int copy = 1; // Start copying by default
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        // Check for the start of the section to remove
+        if (strstr(buffer, name) != NULL) {
+            copy = 0; // Stop copying
         }
-        i++;
+
+        // Copy the line if outside the section to remove
+        if (copy) {
+            fputs(buffer, tempFile);
+        }
+
+        // Check for the end of the section to remove
+        if (strstr(buffer, end) != NULL) {
+            copy = 1; // Resume copying
+        }
     }
 
-    fclose(file);
+    fclose(fp);
     fclose(tempFile);
 
-    if (found == 0) {
-        printf("Profile not found.\n");
-        return;
-    }
+    // Remove the original file and rename the temp file to the original file name
+    remove(filename);
+    rename("temp.txt", filename);
 
-    if (remove("prof.txt") != 0) {
-        printf("Error removing file.\n");
-        return;
-    }
-    if (rename(tempFileName, "prof.txt") != 0) {
-        printf("Error renaming file.\n");
-        return;
-    }
+    printf("Deleted Successfully.\n");
 
-    printf("Profile deleted successfully.\n");
-
-    profile_mainMenu();
 }
 
+void delProfile2(string filename, string name){
+  FILE *fp = fopen(filename, "r");
+    if (fp == NULL) {
+        perror("Failed to open file for reading");
+        return;
+    }
+
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        perror("Failed to open temporary file for writing");
+        fclose(fp);
+        return;
+    }
+
+    char buffer[256]; // Assuming each line won't exceed 255 characters
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        // Use strstr to find the target substring in the current line
+        if (strstr(buffer, name) == NULL) {
+            // If the line does not contain the target name, write it to the temp file
+            fputs(buffer, tempFile);
+        }
+    }
+
+    fclose(fp);
+    fclose(tempFile);
+
+    // Remove the original file and rename the temp file to the original file name
+    remove(filename);
+    if (rename("temp.txt", filename) != 0) {
+        perror("Error renaming temporary file");
+    } else {
+        printf("Profile deleted successfully.\n");
+    }
+}
 
 void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
                 int fog, FILE *file){
@@ -665,7 +684,10 @@ void profile_mainMenu() {
 
       if (con == 'Y' || con == 'y'){
         blank();
-        delProfile(name);
+        delProfile1("prof.txt", name);
+        delProfile2("profNames.txt", name);
+        profile_mainMenu();
+
       }
       else{
         blank();
