@@ -517,17 +517,12 @@ void copy(string target){
     {
         printf("\nError reading file\n");
     }
-    printf("\nFiles open correctly\n");
 
     cursorStart(fp1, target);
 
     while (fgets(text, sizeof(text), fp1) != NULL){
         fprintf(fp2, "%s", text);
     }
-
-
-    printf("File created and text copied to it\n\n");
-
 
     fclose(fp1);
     fclose(fp2);
@@ -544,16 +539,10 @@ void paste(){
     {
         printf("\nError reading file\n");
     }
-    printf("\nFiles open correctly\n");
-
 
     while (fgets(text, sizeof(text), fp2) != NULL){
         fprintf(fp1, "%s", text);
     }
-
-
-    printf("File created and text copied to it\n\n");
-
 
     fclose(fp1);
     fclose(fp2);
@@ -579,7 +568,6 @@ void manipulate(string target, string cope, struct Cell board[][15], char state,
     {
         printf("\nError reading file\n");
     }
-    printf("\nFiles open correctly\n");
 
     int fog;
 
@@ -625,7 +613,6 @@ void manipulate(string target, string cope, struct Cell board[][15], char state,
     remove("prof.txt");
     rename("temp.txt", "prof.txt");
 
-    printf("Manipulation successful.\n");
     paste();
 
 }
