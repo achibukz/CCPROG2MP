@@ -29,6 +29,7 @@ void printProfile(Profile profile) {
   printf("     Classic-Easy: %d\n", profile.lostGame[0]);
   printf("     Classic-Difficult: %d\n", profile.lostGame[1]);
   printf("     Custom: %d\n", profile.lostGame[2]);
+  printf("  Games Played: %d\n", profile.gameP);
 }
 
 /*
@@ -41,42 +42,19 @@ void printProfile(Profile profile) {
   @param: *numNames - A integer pointer that stores how many players do we have
  */
 void arrProf(string names[], int *numNames) {
-    FILE *file = fopen("prof.txt", "a+");
+    FILE *file = fopen("profNames.txt", "a+");
     if (file == NULL) {
     printf("Error Opening File.");
     }
 
     // Initialize the Number of Names to 0
     *numNames = 0;
-    while (*numNames < 40 && fscanf(file, "%20s", names[*numNames]) != EOF) {
+
+     while (*numNames < 10 && fscanf(file, "%20s", names[*numNames]) != EOF) {
         (*numNames)++;
         while (fgetc(file) != '\n' && !feof(file)); 
     }
 
-    int i;
-
-    int num = *numNames / 4;
-    int cnt = 0;
-    string temp[num];
-
-    for (i = 0; i < *numNames; i++){
-      if(i % 4 == 0){
-        strcpy(temp[cnt], names[i]);
-        cnt++;
-      }
-    }
-
-    *numNames /= 4;
-
-    for (i = 0; i < *numNames; i++){
-      strcpy(names[i], temp[i]);
-    }
-
-    printf("arrprof\n");
-    for(i = 0; i < *numNames; i++){
-      printf("%s\n", names[i]);
-    }
-    printf("\n");
 
     fclose(file);
 
@@ -102,12 +80,6 @@ void selSort(string arr[], int n) {
             strcpy(arr[min], temp);
         }
     }
-
-    printf("Selsort\n ");
-    for(i = 0; i < n; i++){
-      printf("%s\n", arr[i]);
-    }
-    printf("\n");
 }
 
 int profFinder(string arr[], string name, int n){
@@ -175,6 +147,8 @@ Profile createProfile() {
     profile.lostGame[i] = 0;
   }
 
+  profile.gameP = 0;
+
   profileArr[numProf] = profile;
 
   FILE *file = fopen("prof.txt", "a");
@@ -182,6 +156,7 @@ Profile createProfile() {
     printf("Error Opening File.");
   }
 
+  // fprintf(file,"Profile: ");
   fprintf(file, "%s ", profile.name);
   for (int i = 0; i < 3; i++) {
     fprintf(file, "%d ", profile.wonGame[i]);
@@ -189,28 +164,33 @@ Profile createProfile() {
   for (int i = 0; i < 3; i++) {
     fprintf(file, "%d ", profile.lostGame[i]);
   }
+  fprintf(file, "%d ", profile.gameP);
   fprintf(file, "\n");
 
-  fprintf(file, "%s's Board 1: \n", profile.name);
-  for (i = 0; i < 18; i++){
-    fprintf(file, "\n");
-  }
 
-
-  fprintf(file, "%s's Board 2: \n", profile.name);
-  for (i = 0; i < 18; i++){
-    fprintf(file, "\n");
-  }
-
-  fprintf(file, "%s's Board 3: \n", profile.name);
-  for (i = 0; i < 18; i++){
-    fprintf(file, "\n");
+  for (i = 0; i < 3; i++){
+    fprintf(file, "%s's Board %d: \n", profile.name, i + 1);
   }
 
   fprintf(file, "\n");
 
 
   fclose(file);
+
+  FILE *fp1 = fopen("profNames.txt", "a");
+
+  if (fp1 == NULL) {
+    printf("Error Opening File.");
+  }
+
+  int lead = 0;
+  fprintf(fp1, "%s ", profile.name);
+  fprintf(fp1, "%d", lead);
+  fprintf(fp1, "\n");
+
+
+
+  fclose(fp1);
 
   blank();
   printf("Profile is Saved.\n");
@@ -237,9 +217,9 @@ void viewStat(string name) {
     printf("Error Opening File.");
   }
 
-  while (fscanf(file, "%s %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
+  while (fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
                 &profile.wonGame[1], &profile.wonGame[2], &profile.lostGame[0],
-                &profile.lostGame[1], &profile.lostGame[2]) != EOF) {
+                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP) != EOF) {
     if (strcmp(profile.name, name) == 0) {
       found = 1;
       break;
@@ -270,12 +250,6 @@ void selProfile(){
     int nCheck = 0;
 
     arrProf(arr, &numNames);
-
-    printf("SelProf\n");
-
-    for (i = 0; i < 10; i++){
-      printf("%s\n", arr[i]);
-    }
 
     printf("Select Your Profile: \n");
     for (i = 0; i < numNames; i++) {
@@ -308,9 +282,9 @@ void selProfile(){
         printf("Error Opening File.");
     }
 
-    while (fscanf(file, "%s %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
+    while (fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
                 &profile.wonGame[1], &profile.wonGame[2], &profile.lostGame[0],
-                &profile.lostGame[1], &profile.lostGame[2]) != EOF) {
+                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP) != EOF) {
         if (strcmp(profile.name, arr[name]) == 0) {
             break;
         }
@@ -361,6 +335,8 @@ void profileChanger(Profile *profile, int type, int diff, int win){
         profile->lostGame[2]++;
     }
 
+    profile->gameP++;
+
 
   FILE *file = fopen("prof.txt", "r+");
   if (file == NULL) {
@@ -368,9 +344,9 @@ void profileChanger(Profile *profile, int type, int diff, int win){
   }
 
   cursorStart(file, profile->name);
-  fprintf(file, "%s %d %d %d %d %d %d", profile->name, 
+  fprintf(file, "%s %d %d %d %d %d %d %d", profile->name, 
           profile->wonGame[0], profile->wonGame[1], profile->wonGame[2],
-          profile->lostGame[0], profile->lostGame[1], profile->lostGame[2]);
+          profile->lostGame[0], profile->lostGame[1], profile->lostGame[2], profile->gameP);
 
   fclose(file);
   blank();
@@ -468,9 +444,9 @@ void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
     fprintf(file, "\n");
   }
 
-  fprintf(file, "HI BITCHES\n");
 }
 
+/*
 void recentGame(struct Cell board[][15], char state, int boardRows, int boardColumn, Profile *profile, int n){
   
   FILE *file = fopen("prof.txt", "r+");
@@ -488,20 +464,141 @@ void recentGame(struct Cell board[][15], char state, int boardRows, int boardCol
   }
 
   string check;
-  sprintf(check, "%s's Board %d:", profile -> name, n);
-
+  //sprintf(check, "%s's Board %d:", profile -> name, n);
+  strcpy(check, "Mikhos's Board :");
   cursorStart(file, check);
   fseek(file, strlen(check) + 1, SEEK_CUR);
   fprintf(file, "\n");
 
   fprintf(file, "%c %d %d\n", state, boardRows, boardColumn);
   printBoardTex(board, boardRows, boardColumn, fog, file);
-  fprintf(file, "HI FUCKERS\n");
-
-
-
 
   fclose(file);                
+}
+*/
+
+void copy(string target){
+    string text;
+
+    FILE *fp1, *fp2;
+    fp1 = fopen("prof.txt", "r");
+    fp2 = fopen("dest.txt", "w");
+
+    if(fp1 == NULL || fp2 == NULL)
+    {
+        printf("\nError reading file\n");
+    }
+    printf("\nFiles open correctly\n");
+
+    cursorStart(fp1, target);
+
+    while (fgets(text, sizeof(text), fp1) != NULL){
+        fprintf(fp2, "%s", text);
+    }
+
+
+    printf("File created and text copied to it\n\n");
+
+
+    fclose(fp1);
+    fclose(fp2);
+}
+
+void paste(){
+    string text;
+
+    FILE *fp1, *fp2;
+    fp1 = fopen("prof.txt", "a");
+    fp2 = fopen("dest.txt", "r+");
+
+    if(fp1 == NULL || fp2 == NULL)
+    {
+        printf("\nError reading file\n");
+    }
+    printf("\nFiles open correctly\n");
+
+
+    while (fgets(text, sizeof(text), fp2) != NULL){
+        fprintf(fp1, "%s", text);
+    }
+
+
+    printf("File created and text copied to it\n\n");
+
+
+    fclose(fp1);
+    fclose(fp2);
+
+    remove("dest.txt");
+}
+
+void rewriteFile(FILE *sourceFile, FILE *destFile, long endPos) {
+    char buffer[256];
+    while (ftell(sourceFile) < endPos && fgets(buffer, sizeof(buffer), sourceFile) != NULL) {
+        fputs(buffer, destFile);
+    }
+}
+
+void manipulate(string target, string cope, struct Cell board[][15], char state, int boardRows, int boardColumn, Profile *profile, int n){
+    copy(cope);
+    
+    FILE *file;
+
+    file = fopen("prof.txt", "r+");
+
+    if(file == NULL)
+    {
+        printf("\nError reading file\n");
+    }
+    printf("\nFiles open correctly\n");
+
+    int fog;
+
+  if (state == 'W' || state == 'L'){
+    fog = 0;
+  }
+  else if (state == 'Q'){
+    fog = 1;
+  }
+
+    cursorStart(file, target);
+    fprintf(file, "%s\n", target);
+
+    fprintf(file, "%c %d %d\n", state, boardRows, boardColumn);
+    printBoardTex(board, boardRows, boardColumn, fog, file);
+
+    fprintf(file,"\n");
+
+    long endPos = ftell(file);
+
+    fclose(file);
+
+ file = fopen("prof.txt", "r+");
+    if (file == NULL) {
+        printf("\nError reading file\n");
+        return;
+    }
+
+    // Rewrite the file, discarding lines below the inserted text
+    FILE *tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("\nError opening temporary file\n");
+        fclose(file);
+        return;
+    }
+
+    rewriteFile(file, tempFile, endPos);
+
+    fclose(file);
+    fclose(tempFile);
+
+    // Replace original file with temporary file
+    remove("prof.txt");
+    rename("temp.txt", "prof.txt");
+
+    printf("Manipulation successful.\n");
+    paste();
+
 }
 
 
