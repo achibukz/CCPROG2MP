@@ -29,7 +29,41 @@ void printProfile(Profile profile) {
   printf("     Classic-Easy: %d\n", profile.lostGame[0]);
   printf("     Classic-Difficult: %d\n", profile.lostGame[1]);
   printf("     Custom: %d\n", profile.lostGame[2]);
-  printf("  Games Played: %d\n", profile.gameP);
+  printf("  Games Played: %d\n", profile.gameP - 1);
+  printf("  Three Most Recent Games: \n");
+  printBoards(profile);
+}
+
+void printBoards(Profile profile) {
+
+    FILE *file = fopen("prof.txt", "r");
+    if (file == NULL) {
+    printf("Error Opening File.");
+    }
+    string start;
+    sprintf(start, "%s's Board 1:", profile.name);
+    string check;
+    sprintf(check, "%s End", profile.name);
+    char line[256];
+    int printing = 0; 
+
+    while (fgets(line, sizeof(line), file)) {
+        if (printing) {
+            if (strstr(line, check)) {
+                printing = 0;
+                printf("    %s", line); 
+            } else {
+                printf("    %s", line); 
+            }
+        } else {
+            if (strstr(line, start)) {
+                printing = 1;
+                printf("    %s", line);
+            }
+        }
+    }
+
+    fclose(file);
 }
 
 /*
@@ -147,7 +181,7 @@ Profile createProfile() {
     profile.lostGame[i] = 0;
   }
 
-  profile.gameP = 0;
+  profile.gameP = 1;
 
   profileArr[numProf] = profile;
 
@@ -172,6 +206,8 @@ Profile createProfile() {
     fprintf(file, "%s's Board %d: \n", profile.name, i + 1);
   }
 
+  fprintf(file, "\n");
+  fprintf(file, "%s End\n", profile.name);
   fprintf(file, "\n");
 
 
@@ -331,7 +367,7 @@ void profileChanger(Profile *profile, int type, int diff, int win){
     else if (type == 1 && diff == 2 && win == 0){
         profile->lostGame[1]++;
     }
-    else if (type == 1 && win == 0){
+    else if (type == 2 && win == 0){
         profile->lostGame[2]++;
     }
 
@@ -445,37 +481,6 @@ void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
   }
 
 }
-
-/*
-void recentGame(struct Cell board[][15], char state, int boardRows, int boardColumn, Profile *profile, int n){
-  
-  FILE *file = fopen("prof.txt", "r+");
-  if (file == NULL) {
-    printf("Error Opening File.");
-  }
-
-  int fog;
-
-  if (state == 'W' || state == 'L'){
-    fog = 0;
-  }
-  else if (state == 'Q'){
-    fog = 1;
-  }
-
-  string check;
-  //sprintf(check, "%s's Board %d:", profile -> name, n);
-  strcpy(check, "Mikhos's Board :");
-  cursorStart(file, check);
-  fseek(file, strlen(check) + 1, SEEK_CUR);
-  fprintf(file, "\n");
-
-  fprintf(file, "%c %d %d\n", state, boardRows, boardColumn);
-  printBoardTex(board, boardRows, boardColumn, fog, file);
-
-  fclose(file);                
-}
-*/
 
 void copy(string target){
     string text;

@@ -32,6 +32,7 @@ struct Cell {
 
 void blank();
 void printProfile(Profile profile);
+void printBoards(Profile profile);
 void arrProf(string names[], int *numNames);
 void selSort(string arr[], int n);
 int profFinder(string arr[], string name, int n);

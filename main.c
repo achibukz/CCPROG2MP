@@ -243,8 +243,14 @@ void printBoard(struct Cell board[][15], int boardRows, int boardColumns,
         printf("%d  ", i);
       }
       if (board[i][j].state.isMine == 1 && fog == 0) {
-        iSetColor(I_COLOR_RED);
-        printf("X  ");
+        if(board[i][j].state.isFlagged){
+          iSetColor(I_COLOR_PURPLE);
+          printf("!  ");
+        }
+        else{
+          iSetColor(I_COLOR_RED);
+          printf("X  ");
+        }
       } else if (board[i][j].state.isFlagged == 1) {
         iSetColor(I_COLOR_YELLOW);
         printf("?  ");
@@ -294,7 +300,7 @@ int writeCustomLevel(char fileName[]) {
   int cursorX = 3, cursorY = 1;
   struct CoordTag userCell = {0, 0};
   char userChar;
-  int userChoosing;
+  //int userChoosing;
   int levelIsValid = 0;
   int userMinesPlaced = 0;
 
@@ -337,7 +343,7 @@ int writeCustomLevel(char fileName[]) {
 
   while (!levelIsValid) {
     while (makingLevel) {
-      userChoosing = 1;
+      //userChoosing = 1;
       //iClear(0, 0, 50, 50);
       system("cls");
       printBoard(board, boardRows, boardCols, 0);
@@ -346,7 +352,7 @@ int writeCustomLevel(char fileName[]) {
       printf("Press S to finish and save.\n");
 
       iMoveCursor(cursorX, cursorY);
-      while (userChoosing) {
+      while (kbhit()) {
         userChar = getch();
         // printf("User char: %d\n", userChar);
         if (userChar == -32) {
@@ -392,10 +398,10 @@ int writeCustomLevel(char fileName[]) {
           }
           // userCell.xCoord = 0;
           // userCell.yCoord = 0;
-          userChoosing = 0;
+          //userChoosing = 0;
           userChar = ' ';
         } else if (userChar == 'S' || userChar == 's') {
-          userChoosing = 0;
+          //userChoosing = 0;
           if (userMinesPlaced == 0 ||
               userMinesPlaced == boardRows * boardCols) {
             while (userChar != 13) { // Enter key
@@ -445,7 +451,7 @@ void startGame(Profile *profile) {
   int turnCount = 0;
   struct Cell board[15][15];
 
-  int userChoosing = 0;
+  //int userChoosing = 0;
   char userChar;
   char customFileName[55];
   int cursorX = 3, cursorY = 1;
@@ -456,7 +462,11 @@ void startGame(Profile *profile) {
   struct CoordTag userCell = {0, 0};
 
   int *gameStatus = 0;
-  int win = 0;
+  int gameResult = 0;
+
+  int totalsec = 0;
+  int hour = 0; int min = 0; int sec = 0;
+  time_t start = time(NULL);
 
   for (i = 0; i < 15; i++) {
     for (j = 0; j < 15; j++) {
@@ -503,7 +513,7 @@ void startGame(Profile *profile) {
   while (gameStatus) {
     // cursorX = 2;
     // cursorY = 1;
-    userChoosing = 1;
+    //userChoosing = 1;
     revealCount = 0;
 
     //iClear(0, 0, 50, 50);
@@ -511,8 +521,15 @@ void startGame(Profile *profile) {
     printBoard(board, boardRows, boardCols, 1);
     printf("Press an arrow key to move.\n");
     printf("Press I to inspect, F to flag, Q to quit.\n");
+    
+    totalsec = difftime(time(NULL), start);
+    hour = totalsec / 3600;
+    min = (totalsec % 3600) / 60;
+    sec = totalsec % 60;
+    printf("Time elapsed: %02d:%02d:%02d\n", hour, min, sec);
+    
     iMoveCursor(cursorX, cursorY);
-    while (userChoosing == 1) {
+    if (kbhit()) {
       userChar = getch();
       // printf("User char: %d\n", userChar);
       if (userChar == -32) {
@@ -549,7 +566,7 @@ void startGame(Profile *profile) {
         iMoveCursor(cursorX, cursorY);
       } else if (userChar == 'F' || userChar == 'f' || userChar == 'I' ||
                  userChar == 'i') {
-        userChoosing = 0;
+        //userChoosing = 0;
         inspectOrFlag = userChar;
         if (turnCount == 0) {
           initializeMines(board, mineCount, boardRows, boardCols, userCell);
@@ -568,8 +585,9 @@ void startGame(Profile *profile) {
         // userCell.yCoord = 0;
         userChar = ' ';
       } else if (userChar == 'Q' || userChar == 'q') {
-        userChoosing = 0;
+        //userChoosing = 0;
         gameStatus--; // Quit
+        gameResult = 2;
       }
     }
 
@@ -585,35 +603,52 @@ void startGame(Profile *profile) {
 
     if (flagCount + revealCount == boardRows * boardCols) {
       if (flagCount == mineCount) {
-        win = 1;
+        gameResult = 1; // Win
       }
       gameStatus--;
     }
+    Sleep(275);
   }
 
   //iClear(0, 0, 50, 50);
   system("cls");
   printf("Game over!\n");
-  if (userChar != 'Q') {
-    printBoard(board, boardRows, boardCols, 0);
 
-    if (win) {
-      printf("You win!\n");
-     recentGame(board, 'W', boardRows, boardCols, profile, 1);
+  
+  string check;
+  string copy;
 
-    } else {
-      printf("You lose!\n");
-     recentGame(board, 'L', boardRows, boardCols, profile, 1);
-
-    }
-  } else {
-    printf("You quit the game!\n");
-    printBoard(board, boardRows, boardCols, 1);
-     recentGame(board, 'Q', boardRows, boardCols, profile, 1);
+  if (profile->gameP % 3 == 1){
+    sprintf(check, "%s's Board 1:", profile->name);
+    sprintf(copy, "%s's Board 2:", profile->name);
+  }
+  else if (profile->gameP % 3 == 2){
+    sprintf(check, "%s's Board 2:", profile->name);
+    sprintf(copy, "%s's Board 3:", profile->name);
+  }
+  else if (profile->gameP % 3 == 0){
+    sprintf(check, "%s's Board 3:", profile->name);
+    sprintf(copy, "%s End", profile->name);
 
   }
 
-  profileChanger(profile, gameType, difficulty, win);
+  if(gameResult == 0){
+    printBoard(board, boardRows, boardCols, 0);
+    printf("You lose!\n");
+    manipulate(check, copy, board, 'L', boardRows, boardCols, profile, 1);
+  }
+  else if(gameResult == 1){
+    printBoard(board, boardRows, boardCols, 0);
+    printf("You win!\n");
+    manipulate(check, copy, board, 'W', boardRows, boardCols, profile, 1);
+  }
+  else if(gameResult == 2){
+    printBoard(board, boardRows, boardCols, 1);
+    printf("You quit the game!\n");
+    manipulate(check, copy, board, 'Q', boardRows, boardCols, profile, 1);
+  }
+
+  profileChanger(profile, gameType, difficulty, gameResult);
 
 }
 
