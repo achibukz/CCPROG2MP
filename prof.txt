@@ -1,4 +1,4 @@
-Achi 0 0 0 1 0 0 2 
+Achi 0 0 0 2 0 0 3 
 Achi's Board 1:
 L 8 8
    0  1  2  3  4  5  6  7 
@@ -11,7 +11,18 @@ L 8 8
 6  1  .  .  .  .  .  X  .  
 7  0  1  X  .  X  .  .  .  
 
-Achi's Board 2: 
+Achi's Board 2:
+L 8 8
+   0  1  2  3  4  5  6  7 
+0  ?  .  .  X  .  .  .  .  
+1  .  ?  X  .  .  .  .  .  
+2  X  2  2  2  1  .  .  .  
+3  1  1  .  X  .  .  .  .  
+4  .  .  .  X  .  .  .  .  
+5  X  .  .  X  .  .  .  X  
+6  .  .  .  .  .  .  .  .  
+7  .  .  .  .  .  X  .  .  
+
 Achi's Board 3: 
 
 Achi End
@@ -65,12 +76,6 @@ Hyein's Board 3:
 Hyein End
 
 
-Danielle 0 0 0 0 0 0 1 
-Danielle's Board 1: 
-Danielle's Board 2: 
-Danielle's Board 3: 
-
-Danielle End
 
 Minju 0 0 0 0 0 0 1 
 Minju's Board 1: 
@@ -79,14 +84,25 @@ Minju's Board 3:
 
 Minju End
 
-Minji 0 0 0 0 0 0 1 
-Minji's Board 1: 
+Minji 0 0 0 1 0 0 2 
+Minji's Board 1:
+L 8 8
+   0  1  2  3  4  5  6  7 
+0  0  0  1  X  .  .  .  X  
+1  0  0  1  .  .  .  .  .  
+2  0  0  1  .  .  .  .  .  
+3  1  1  .  X  .  .  .  .  
+4  1  X  .  X  .  .  X  .  
+5  .  .  .  .  .  .  .  X  
+6  .  .  .  .  X  X  .  .  
+7  .  .  .  X  .  .  .  .  
+
 Minji's Board 2: 
 Minji's Board 3: 
 
 Minji End
 
-Wonhee 0 0 0 3 0 1 6 
+Wonhee 0 0 0 3 1 1 7 
 Wonhee's Board 1:
 L 8 8
    0  1  2  3  4  5  6  7 
@@ -112,13 +128,19 @@ Q 8 8
 7  .  .  .  .  .  .  .  .  
 
 Wonhee's Board 3:
-L 5 5
-   0  1  2  3  4 
-0  .  .  .  .  .  
-1  .  X  .  .  .  
-2  .  .  .  .  .  
-3  .  .  .  .  .  
-4  .  .  .  .  .  
+L 10 15
+   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 
+0  0  1  .  X  .  .  X  .  .  X  X  .  .  .  X  
+1  0  1  X  .  .  X  .  .  .  X  .  X  .  .  .  
+2  0  1  1  .  X  .  .  .  .  .  .  .  X  .  X  
+3  1  1  0  2  X  X  .  .  .  .  .  .  X  X  .  
+4  X  2  1  2  .  .  .  .  .  X  .  .  X  .  .  
+5  .  .  X  .  .  .  .  .  .  .  .  .  .  X  X  
+6  .  .  .  .  X  .  .  .  X  X  .  .  .  X  .  
+7  .  X  X  .  .  .  .  .  .  .  .  X  .  X  .  
+8  .  .  .  .  .  X  X  .  .  .  .  .  .  .  X  
+9  .  .  .  .  X  .  .  .  X  .  .  .  .  .  .  
+
 
 Wonhee End
 
@@ -164,4 +186,5 @@ Hanni's Board 2:
 Hanni's Board 3: 
 
 Hanni End
+
 

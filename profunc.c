@@ -388,10 +388,10 @@ void profileChanger(Profile *profile, int type, int diff, int win){
   blank();
 }
 
-void delProfile1(string filename, string name) {
+void delProfile1(string name) {
     string end;
     sprintf(end, "%s End", name);
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen("prof.txt", "r");
     FILE *tempFile = fopen("temp.txt", "w");
     char buffer[1024];
 
@@ -422,15 +422,15 @@ void delProfile1(string filename, string name) {
     fclose(tempFile);
 
     // Remove the original file and rename the temp file to the original file name
-    remove(filename);
-    rename("temp.txt", filename);
+    remove("prof.txt");
+    rename("temp.txt", "prof.txt");
 
     printf("Deleted Successfully.\n");
 
 }
 
-void delProfile2(string filename, string name){
-  FILE *fp = fopen(filename, "r");
+void delProfile2(string name){
+  FILE *fp = fopen("profNames.txt", "r");
     if (fp == NULL) {
         perror("Failed to open file for reading");
         return;
@@ -456,8 +456,8 @@ void delProfile2(string filename, string name){
     fclose(tempFile);
 
     // Remove the original file and rename the temp file to the original file name
-    remove(filename);
-    if (rename("temp.txt", filename) != 0) {
+    remove("profNames.txt");
+    if (rename("temp.txt", "profNames.txt") != 0) {
         perror("Error renaming temporary file");
     } else {
         printf("Profile deleted successfully.\n");
@@ -671,8 +671,8 @@ void profile_mainMenu() {
 
       if (con == 'Y' || con == 'y'){
         blank();
-        delProfile1("prof.txt", name);
-        delProfile2("profNames.txt", name);
+        delProfile1(name);
+        delProfile2(name);
         profile_mainMenu();
 
       }
