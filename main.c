@@ -271,7 +271,7 @@ int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
                     int *boardCols, int *mineCount) {
   int i, j;
   int readMines = 0;
-
+  
   char filePath[50] = "levels/";
   strcat(filePath, fileName);
   strcat(filePath, ".txt");
@@ -311,6 +311,9 @@ int writeCustomLevel(char fileName[]) {
   int userMinesPlaced = 0;
 
   int makingLevel = 1;
+
+  mkdir("levels");
+
   char filePath[50] = "levels/";
   strcat(filePath, fileName);
   strcat(filePath, ".txt");
@@ -419,6 +422,7 @@ int writeCustomLevel(char fileName[]) {
                      boardRows * boardCols - 1);
               printf("Press enter to continue..");
               userChar = getch();
+              system("cls");
             }
             makingLevel = 1;
           } else {
@@ -443,6 +447,7 @@ int writeCustomLevel(char fileName[]) {
   }
 
   fclose(fp); // Close the file after writing
+  system("cls");
   printf("Text file %s successfully created!\n", fileName);
   printf("Press any key to continue...");
   while(!kbhit()){
@@ -462,8 +467,8 @@ void startGame(Profile *profile) {
   int boardRows;
   int boardCols;
   int mineCount;
-  int flagCount = 0;
-  int revealCount = 0;
+  int flagCount;
+  int revealCount;
   int turnCount = 0;
   struct Cell board[15][15];
 
@@ -530,8 +535,7 @@ void startGame(Profile *profile) {
     // cursorX = 2;
     // cursorY = 1;
     userChoosing = 1;
-    int flagCount = 0;
-    int revealCount = 0;
+    flagCount = 0;
     revealCount = 0;
 
     //iClear(0, 0, 50, 50);
