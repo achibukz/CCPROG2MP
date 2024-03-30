@@ -9,7 +9,6 @@ typedef struct Profile {
   int wonGame[3];
   int lostGame[3];
   int gameP;
-  // Board board;
 
 } Profile;
 
@@ -41,8 +40,8 @@ void selProfile();
 void viewStat(string name);
 void cursorStart(FILE *file, string target);
 void profileChanger(Profile *profile, int type, int diff, int win);
-void delProfile1(string filename, string name);
-void delProfile2(string filename, string name);
+void delProfile1(string name);
+void delProfile2(string name);
 void mainMenu(Profile *profile);
 void profile_mainMenu();
 void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
