@@ -268,10 +268,14 @@ void printBoard(struct Cell board[][15], int boardRows, int boardColumns,
 }
 
 int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
-                    int *boardCols) {
+                    int *boardCols, int *mineCount) {
   int i, j;
-  strcat(fileName, ".txt");
-  FILE *fp = fopen(fileName, "r");
+  int readMines = 0;
+
+  char filePath[50] = "levels/";
+  strcat(filePath, fileName);
+  strcat(filePath, ".txt");
+  FILE *fp = fopen(filePath, "r");
   char currentLine[20] = "";
   if (fp == NULL) {
     printf("Error: could not open file %s.\n", fileName);
@@ -285,9 +289,11 @@ int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
     for (j = 0; j < *boardCols; j++) {
       if (currentLine[j] == 'X') {
         board[i][j].state.isMine = 1;
+        readMines++;
       }
     }
   }
+  *mineCount = readMines;
   fclose(fp); // Close the file after reading
   return 0;   // Return 0 to indicate success
 }
@@ -300,17 +306,20 @@ int writeCustomLevel(char fileName[]) {
   int cursorX = 3, cursorY = 1;
   struct CoordTag userCell = {0, 0};
   char userChar;
-  //int userChoosing;
+  int userChoosing;
   int levelIsValid = 0;
   int userMinesPlaced = 0;
 
   int makingLevel = 1;
-  FILE *fp = fopen(fileName, "r");
+  char filePath[50] = "levels/";
+  strcat(filePath, fileName);
+  strcat(filePath, ".txt");
+  FILE *fp = fopen(filePath, "r");
   if (fp != NULL) {
     printf("Error: file %s already exists.\n", fileName);
     return 1;
   } else {
-    fp = fopen(fileName, "w");
+    fp = fopen(filePath, "w");
 
     do {
       printf("Enter amount of rows: ");
@@ -343,7 +352,7 @@ int writeCustomLevel(char fileName[]) {
 
   while (!levelIsValid) {
     while (makingLevel) {
-      //userChoosing = 1;
+      userChoosing = 1;
       //iClear(0, 0, 50, 50);
       system("cls");
       printBoard(board, boardRows, boardCols, 0);
@@ -352,7 +361,7 @@ int writeCustomLevel(char fileName[]) {
       printf("Press S to finish and save.\n");
 
       iMoveCursor(cursorX, cursorY);
-      while (kbhit()) {
+      if (userChoosing) {
         userChar = getch();
         // printf("User char: %d\n", userChar);
         if (userChar == -32) {
@@ -398,10 +407,10 @@ int writeCustomLevel(char fileName[]) {
           }
           // userCell.xCoord = 0;
           // userCell.yCoord = 0;
-          //userChoosing = 0;
+          userChoosing = 0;
           userChar = ' ';
         } else if (userChar == 'S' || userChar == 's') {
-          //userChoosing = 0;
+          userChoosing = 0;
           if (userMinesPlaced == 0 ||
               userMinesPlaced == boardRows * boardCols) {
             while (userChar != 13) { // Enter key
@@ -417,6 +426,7 @@ int writeCustomLevel(char fileName[]) {
             levelIsValid = 1;
           }
         }
+        
       }
     }
   }
@@ -433,6 +443,12 @@ int writeCustomLevel(char fileName[]) {
   }
 
   fclose(fp); // Close the file after writing
+  printf("Text file %s successfully created!\n", fileName);
+  printf("Press any key to continue...");
+  while(!kbhit()){
+    //
+  }
+  system("cls");
   return 0;   // Return 0 to indicate success
 }
 
@@ -451,7 +467,7 @@ void startGame(Profile *profile) {
   int turnCount = 0;
   struct Cell board[15][15];
 
-  //int userChoosing = 0;
+  int userChoosing = 0;
   char userChar;
   char customFileName[55];
   int cursorX = 3, cursorY = 1;
@@ -504,7 +520,7 @@ void startGame(Profile *profile) {
   else if (gameType == 2) {
     printf("Enter a file name (without .txt): ");
     scanf("%s", customFileName);
-    readCustomLevel(customFileName, board, &boardRows, &boardCols);
+    readCustomLevel(customFileName, board, &boardRows, &boardCols, &mineCount);
   }
 
 
@@ -513,7 +529,9 @@ void startGame(Profile *profile) {
   while (gameStatus) {
     // cursorX = 2;
     // cursorY = 1;
-    //userChoosing = 1;
+    userChoosing = 1;
+    int flagCount = 0;
+    int revealCount = 0;
     revealCount = 0;
 
     //iClear(0, 0, 50, 50);
@@ -529,7 +547,7 @@ void startGame(Profile *profile) {
     printf("Time elapsed: %02d:%02d:%02d\n", hour, min, sec);
     
     iMoveCursor(cursorX, cursorY);
-    if (kbhit()) {
+    if(kbhit() && userChoosing) {
       userChar = getch();
       // printf("User char: %d\n", userChar);
       if (userChar == -32) {
@@ -566,9 +584,9 @@ void startGame(Profile *profile) {
         iMoveCursor(cursorX, cursorY);
       } else if (userChar == 'F' || userChar == 'f' || userChar == 'I' ||
                  userChar == 'i') {
-        //userChoosing = 0;
+        userChoosing = 0;
         inspectOrFlag = userChar;
-        if (turnCount == 0) {
+        if (turnCount == 0 && gameType == 1) {
           initializeMines(board, mineCount, boardRows, boardCols, userCell);
         }
         if (inspectOrFlag == 'I' || inspectOrFlag == 'i') {
@@ -585,7 +603,7 @@ void startGame(Profile *profile) {
         // userCell.yCoord = 0;
         userChar = ' ';
       } else if (userChar == 'Q' || userChar == 'q') {
-        //userChoosing = 0;
+        userChoosing = 0;
         gameStatus--; // Quit
         gameResult = 2;
       }
@@ -607,7 +625,7 @@ void startGame(Profile *profile) {
       }
       gameStatus--;
     }
-    Sleep(275);
+    Sleep(300);
   }
 
   //iClear(0, 0, 50, 50);
@@ -618,17 +636,17 @@ void startGame(Profile *profile) {
   string check;
   string copy;
 
-  if (profile->gameP % 3 == 1){
+  if (profile->gameP == 0){
     sprintf(check, "%s's Board 1:", profile->name);
     sprintf(copy, "%s's Board 2:", profile->name);
   }
-  else if (profile->gameP % 3 == 2){
+  else if (profile->gameP == 1){
     sprintf(check, "%s's Board 2:", profile->name);
     sprintf(copy, "%s's Board 3:", profile->name);
   }
-  else if (profile->gameP % 3 == 0){
+  else if (profile->gameP == 2){
     sprintf(check, "%s's Board 3:", profile->name);
-    sprintf(copy, "%s End", profile->name);
+    sprintf(copy, "%s's Board 3:", profile->name);
 
   }
 
@@ -649,54 +667,60 @@ void startGame(Profile *profile) {
   }
 
   profileChanger(profile, gameType, difficulty, gameResult);
-
+  printf("Press any key to continue...");
+  while(!kbhit()){
+    //
+  }
 }
 
 /*
   Function Comments and Description
 */
 void mainMenu(Profile *profile) {
-    blank();
+  blank();
   char fileName[55];
   int userInput;
   srand(time(0));
   Profile prof = *profile;
+  int stayMenu = 1;
 
-  printf("Welcome to Minesweeper! %s\n", profile -> name);
-  blank();
-  printf("[1] Start Game\n");
-  printf("[2] Create a Level\n");
-  printf("[3] Change Profile\n");
-  printf("[4] View Statistics\n");
-  printf("[5] Quit\n");
-    blank();
-
-  printf("Enter input: ");
-  scanf("%d", &userInput);
 
   // while(userInput != 1 && userInput != 2 && userInput != 3 && userInput != 4
   // && userInput != 5){
-  switch (userInput) {
-  case 1:
-    startGame(&prof);
-    break;
-  case 2:
-    printf("Enter the file name to save the level (without .txt extension): ");
-    scanf("%s", fileName);
-
-    strcat(fileName, ".txt");
-
-    writeCustomLevel(fileName);
-    break;
-  case 3:
-    selProfile();
-    break;
-  case 4:
+  while(stayMenu){
+     printf("Welcome to Minesweeper! %s\n", profile -> name);
     blank();
-    viewStat(prof.name);
-    break;
-  case 5:
-    break;
+    printf("[1] Start Game\n");
+    printf("[2] Create a Level\n");
+    printf("[3] Change Profile\n");
+    printf("[4] View Statistics\n");
+    printf("[5] Quit\n");
+      blank();
+
+    printf("Enter input: ");
+    scanf("%d", &userInput);
+
+    switch (userInput) {
+    case 1:
+      startGame(&prof);
+      break;
+    case 2:
+      printf("Enter the file name to save the level (without .txt extension): ");
+      scanf("%s", fileName);
+
+      writeCustomLevel(fileName);
+      break;
+    case 3:
+      selProfile();
+      break;
+    case 4:
+      blank();
+      viewStat(prof.name);
+      break;
+    case 5:
+      stayMenu = 0;
+      break;
+    }
   }
   //}
 }
