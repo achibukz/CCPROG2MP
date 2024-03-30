@@ -640,17 +640,17 @@ void startGame(Profile *profile) {
   string check;
   string copy;
 
-  if (profile->gameP == 0){
+ if (profile->gameP % 3 == 1){
     sprintf(check, "%s's Board 1:", profile->name);
     sprintf(copy, "%s's Board 2:", profile->name);
   }
-  else if (profile->gameP == 1){
+  else if (profile->gameP % 3 == 2){
     sprintf(check, "%s's Board 2:", profile->name);
     sprintf(copy, "%s's Board 3:", profile->name);
   }
-  else if (profile->gameP == 2){
+  else if (profile->gameP % 3 == 0){
     sprintf(check, "%s's Board 3:", profile->name);
-    sprintf(copy, "%s's Board 3:", profile->name);
+    sprintf(copy, "%s End", profile->name);
 
   }
 
