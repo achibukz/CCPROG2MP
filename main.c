@@ -312,7 +312,7 @@ int writeCustomLevel(char fileName[]) {
 
   int makingLevel = 1;
 
-  mkdir("levels");
+  system("mkdir levels");
 
   char filePath[50] = "levels/";
   strcat(filePath, fileName);
@@ -461,7 +461,7 @@ int writeCustomLevel(char fileName[]) {
   Function Comments and Description
 */
 void startGame(Profile *profile) {
-  int gameType;
+  int gameType = 1;
   int difficulty;
 
   int boardRows;
@@ -476,14 +476,17 @@ void startGame(Profile *profile) {
   char userChar;
   char customFileName[55];
   int cursorX = 3, cursorY = 1;
+  int menuCursorX = 1, menuCursorY = 20;
 
   int i, j;
 
   char inspectOrFlag;
   struct CoordTag userCell = {0, 0};
 
-  int *gameStatus = 0;
+  int gameStatus = 0;
   int gameResult = 0;
+  int hasChosenLevel = 0;
+  int hasChosenGameType = 0;
 
   int totalsec = 0;
   int hour = 0; int min = 0; int sec = 0;
@@ -498,188 +501,299 @@ void startGame(Profile *profile) {
     }
   }
 
-  printf("Choose a game type:\n");
-  printf("[1] Classic game\n");
-  printf("[2] Custom game\n");
-  scanf("%d", &gameType);
-
-  if (gameType == 1) {
-    printf("Choose a difficulty:\n");
-    printf("[1] Easy (8 x 8 level with 10 mines)\n");
-    printf("[2] Difficult (10 x 15 level with 35 mines)\n");
-    scanf("%d", &difficulty);
-
-    if (difficulty == 1) {
-      boardRows = 8;
-      boardCols = 8;
-      mineCount = 10;
-    }
-
-    else if (difficulty == 2) {
-      boardRows = 10;
-      boardCols = 15;
-      mineCount = 35;
-    }
-  }
-
-  else if (gameType == 2) {
-    printf("Enter a file name (without .txt): ");
-    scanf("%s", customFileName);
-    readCustomLevel(customFileName, board, &boardRows, &boardCols, &mineCount);
-  }
-
-
-  gameStatus++;
-
-  while (gameStatus) {
-    // cursorX = 2;
-    // cursorY = 1;
-    userChoosing = 1;
-    flagCount = 0;
-    revealCount = 0;
-
-    //iClear(0, 0, 50, 50);
-    system("cls");
-    printBoard(board, boardRows, boardCols, 1);
-    printf("Press an arrow key to move.\n");
-    printf("Press I to inspect, F to flag, Q to quit.\n");
-    
-    totalsec = difftime(time(NULL), start);
-    hour = totalsec / 3600;
-    min = (totalsec % 3600) / 60;
-    sec = totalsec % 60;
-    printf("Time elapsed: %02d:%02d:%02d\n", hour, min, sec);
-    
-    iMoveCursor(cursorX, cursorY);
-    if(kbhit() && userChoosing) {
-      userChar = getch();
-      // printf("User char: %d\n", userChar);
-      if (userChar == -32) {
-        // printf("Up, down, left, or right?");
-        userChar = getch();
-        switch (userChar) {
-        case 75: // Left arrow
-          if (cursorX - 2 >= 2 && userCell.yCoord - 1 >= 0) {
-            cursorX -= 3;
-            userCell.yCoord--;
+  while(gameType != 3){
+    while (!hasChosenGameType){
+      hasChosenLevel = 0;
+      while(!hasChosenLevel){
+        userChoosing = 1;
+        iClear(menuCursorX-1, menuCursorY-1, 30, 7);
+        printf("Choose a game type:\n");
+        printf("[1] Classic game\n");
+        printf("[2] Custom game\n");
+        printf("[3] Back to main menu\n");
+        iMoveCursor(menuCursorX, menuCursorY);
+        gameType = 1;
+        while(userChoosing){
+          iMoveCursor(menuCursorX, menuCursorY);
+          userChar = getch();
+          // printf("User char: %d\n", userChar);
+          if (userChar == -32) {
+            // printf("Up, down, left, or right?");
+            userChar = getch();
+            switch (userChar) {
+            case 72: // Up arrow
+              if (gameType-1 > 0 && gameType-1 < 4) {
+                gameType--;
+                menuCursorY--;
+                iMoveCursor(menuCursorX, menuCursorY);
+              }
+              break;
+            case 80: // Down arrow
+              if (gameType+1 > 0 && gameType+1 < 4) {
+                gameType++;
+                menuCursorY++;
+                iMoveCursor(menuCursorX, menuCursorY);
+              }
+              break;
+            default:
+              break;
+            }
+            
+          } else if(userChar == 13){
+            userChoosing = 0;
+            menuCursorX--;
+            hasChosenGameType = 1;
+            iMoveCursor(menuCursorX, menuCursorY);
           }
-          break;
-        case 77: // Right arrow
-          if (cursorX + 2 < boardCols * 3 && userCell.yCoord + 1 < boardCols) {
-            cursorX += 3;
-            userCell.yCoord++;
-          }
-          break;
-        case 72: // Up arrow
-          if (cursorY - 1 >= 1 && userCell.xCoord - 1 >= 0) {
-            cursorY--;
-            userCell.xCoord--;
-          }
-          break;
-        case 80: // Down arrow
-          if (cursorY + 1 <= boardRows && userCell.xCoord + 1 < boardRows) {
-            cursorY++;
-            userCell.xCoord++;
-          }
-          break;
-        default:
-          break;
         }
+
+        if (gameType == 1) {
+          difficulty = 1;
+          userChoosing = 1;
+         
+          iMoveCursor(1, 20);
+          iClear(menuCursorX-1, menuCursorY-1, 30, 7);
+          printf("Choose a difficulty:\n");
+          printf("[1] Easy (8 x 8 level with 10 mines)\n");
+          printf("[2] Difficult (10 x 15 level with 35 mines)\n");
+          printf("[3] Back to game types");
+          while(userChoosing){
+            iMoveCursor(menuCursorX, menuCursorY);
+            userChar = getch();
+            // printf("User char: %d\n", userChar);
+            if (userChar == -32) {
+              // printf("Up, down, left, or right?");
+              userChar = getch();
+              switch (userChar) {
+              case 72: // Up arrow
+                if (difficulty-1 > 0 && difficulty-1 < 4) {
+                  difficulty--;
+                  menuCursorY--;
+                  iMoveCursor(menuCursorX, menuCursorY);
+                }
+                break;
+              case 80: // Down arrow
+                if (difficulty+1 > 0 && difficulty+1 < 4) {
+                  difficulty++;
+                  menuCursorY++;
+                  iMoveCursor(menuCursorX, menuCursorY);
+                }
+                break;
+              default:
+                break;
+              }
+            
+          } else if(userChar == 13){
+            userChoosing = 0;
+            menuCursorX--;
+            hasChosenLevel = 1;
+          }
+        }
+
+          if (difficulty == 1) {
+            boardRows = 8;
+            boardCols = 8;
+            mineCount = 10;
+            hasChosenLevel = 1;
+            hasChosenGameType = 1;
+            gameStatus++;
+          }
+
+          else if (difficulty == 2) {
+            boardRows = 10;
+            boardCols = 15;
+            mineCount = 35;
+            hasChosenLevel = 1;
+            hasChosenGameType = 1;
+            gameStatus++;
+          }
+          else if(difficulty == 3){
+            hasChosenGameType = 0;
+            hasChosenLevel = 0;
+            gameType = 3;
+          }
+        }
+
+        else if (gameType == 2) {
+            iClear(menuCursorX, menuCursorY, 30, 7);
+            iMoveCursor(menuCursorX, menuCursorY);
+            printf("Enter B to go back to game types.\n");
+            printf("Enter a file name (without .txt): ");
+            scanf("%s", customFileName);
+            if(strcmp(customFileName, "B") == 0){
+              hasChosenGameType = 0;
+            }
+            else if(readCustomLevel(customFileName, board, &boardRows, &boardCols, &mineCount) == 1){
+              printf("Press any key to continue...\n");
+              while(!kbhit());
+            }
+            else{
+              hasChosenLevel = 1;
+              gameStatus++;
+            }
+        }
+
+        else if (gameType == 3) {
+          gameStatus = 0;
+          hasChosenGameType = 1;
+          hasChosenLevel = 1;
+        }
+      }
+
+      while (gameStatus) {
+        // cursorX = 2;
+        // cursorY = 1;
+        userChoosing = 1;
+        flagCount = 0;
+        revealCount = 0;
+
+        //iClear(0, 0, 50, 50);
+        system("cls");
+        printBoard(board, boardRows, boardCols, 1);
+        printf("Press an arrow key to move.\n");
+        printf("Press I to inspect, F to flag, Q to quit.\n");
+        
+        totalsec = difftime(time(NULL), start);
+        hour = totalsec / 3600;
+        min = (totalsec % 3600) / 60;
+        sec = totalsec % 60;
+        printf("Time elapsed: %02d:%02d:%02d\n", hour, min, sec);
+        
         iMoveCursor(cursorX, cursorY);
-      } else if (userChar == 'F' || userChar == 'f' || userChar == 'I' ||
-                 userChar == 'i') {
-        userChoosing = 0;
-        inspectOrFlag = userChar;
-        if (turnCount == 0 && gameType == 1) {
-          initializeMines(board, mineCount, boardRows, boardCols, userCell);
-        }
-        if (inspectOrFlag == 'I' || inspectOrFlag == 'i') {
-          if (inspect(board, boardRows, boardCols, userCell) == 1) {
-            gameStatus--;
+        if(kbhit() && userChoosing) {
+          userChar = getch();
+          // printf("User char: %d\n", userChar);
+          if (userChar == -32) {
+            // printf("Up, down, left, or right?");
+            userChar = getch();
+            switch (userChar) {
+            case 75: // Left arrow
+              if (cursorX - 2 >= 2 && userCell.yCoord - 1 >= 0) {
+                cursorX -= 3;
+                userCell.yCoord--;
+              }
+              break;
+            case 77: // Right arrow
+              if (cursorX + 2 < boardCols * 3 && userCell.yCoord + 1 < boardCols) {
+                cursorX += 3;
+                userCell.yCoord++;
+              }
+              break;
+            case 72: // Up arrow
+              if (cursorY - 1 >= 1 && userCell.xCoord - 1 >= 0) {
+                cursorY--;
+                userCell.xCoord--;
+              }
+              break;
+            case 80: // Down arrow
+              if (cursorY + 1 <= boardRows && userCell.xCoord + 1 < boardRows) {
+                cursorY++;
+                userCell.xCoord++;
+              }
+              break;
+            default:
+              break;
+            }
+            iMoveCursor(cursorX, cursorY);
+          } else if (userChar == 'F' || userChar == 'f' || userChar == 'I' ||
+                    userChar == 'i') {
+            userChoosing = 0;
+            inspectOrFlag = userChar;
+            if (turnCount == 0 && gameType == 1) {
+              initializeMines(board, mineCount, boardRows, boardCols, userCell);
+            }
+            if (inspectOrFlag == 'I' || inspectOrFlag == 'i') {
+              if (inspect(board, boardRows, boardCols, userCell) == 1) {
+                gameStatus--;
+              }
+              turnCount++;
+            }
+            if (inspectOrFlag == 'F' || inspectOrFlag == 'f') {
+              flag(board, userCell);
+              turnCount++;
+            }
+            // userCell.xCoord = 0;
+            // userCell.yCoord = 0;
+            userChar = ' ';
+          } else if (userChar == 'Q' || userChar == 'q') {
+            userChoosing = 0;
+            gameStatus--; // Quit
+            gameResult = 2;
           }
-          turnCount++;
         }
-        if (inspectOrFlag == 'F' || inspectOrFlag == 'f') {
-          flag(board, userCell);
-          turnCount++;
+
+        for (i = 0; i < boardRows; i++) {
+          for (j = 0; j < boardCols; j++) {
+            if (board[i][j].state.isFlagged == 1 && board[i][j].state.isMine == 1) {
+              flagCount++;
+            } else if (board[i][j].state.isRevealed == 1) {
+              revealCount++;
+            }
+          }
         }
-        // userCell.xCoord = 0;
-        // userCell.yCoord = 0;
-        userChar = ' ';
-      } else if (userChar == 'Q' || userChar == 'q') {
-        userChoosing = 0;
-        gameStatus--; // Quit
-        gameResult = 2;
+
+        if (flagCount + revealCount == boardRows * boardCols) {
+          if (flagCount == mineCount) {
+            gameResult = 1; // Win
+          }
+          gameStatus--;
+        }
+        Sleep(300);
+      }
+
+      if(gameType != 3){
+        //iClear(0, 0, 50, 50);
+        system("cls");
+        printf("Game over!\n");
+
+        int leader = 0;
+
+        if ((gameResult == 1 && profile-> totalSec > totalsec) || (gameResult == 1 && profile->totalSec == 0)){
+          profile->totalSec = totalsec;
+          leader = 1;
+        }
+
+        string check;
+        string copy;
+
+        if (profile->gameP % 3 == 1){
+          sprintf(check, "%s's Board 1:", profile->name);
+          sprintf(copy, "%s's Board 2:", profile->name);
+        }
+        else if (profile->gameP % 3 == 2){
+          sprintf(check, "%s's Board 2:", profile->name);
+          sprintf(copy, "%s's Board 3:", profile->name);
+        }
+        else if (profile->gameP % 3 == 0){
+          sprintf(check, "%s's Board 3:", profile->name);
+          sprintf(copy, "%s End", profile->name);
+
+        }
+
+        if(gameResult == 0){
+          printBoard(board, boardRows, boardCols, 0);
+          printf("You lose!\n");
+          manipulate(check, copy, board, 'L', boardRows, boardCols, profile, 1);
+        }
+        else if(gameResult == 1){
+          printBoard(board, boardRows, boardCols, 0);
+          printf("You win!\n");
+          manipulate(check, copy, board, 'W', boardRows, boardCols, profile, 1);
+        }
+        else if(gameResult == 2){
+          printBoard(board, boardRows, boardCols, 1);
+          printf("You quit the game!\n");
+          manipulate(check, copy, board, 'Q', boardRows, boardCols, profile, 1);
+        }
+
+        profileChanger(profile, gameType, difficulty, gameResult, leader);
+        printf("Press any key to continue...");
+        while(!kbhit()){
+          //
+        }
+        gameType = 3;
       }
     }
-
-    for (i = 0; i < boardRows; i++) {
-      for (j = 0; j < boardCols; j++) {
-        if (board[i][j].state.isFlagged == 1 && board[i][j].state.isMine == 1) {
-          flagCount++;
-        } else if (board[i][j].state.isRevealed == 1) {
-          revealCount++;
-        }
-      }
-    }
-
-    if (flagCount + revealCount == boardRows * boardCols) {
-      if (flagCount == mineCount) {
-        gameResult = 1; // Win
-      }
-      gameStatus--;
-    }
-    Sleep(300);
-  }
-
-  //iClear(0, 0, 50, 50);
-  system("cls");
-  printf("Game over!\n");
-
-  int leader = 0;
-
-  if ((gameResult == 1 && profile-> totalSec > totalsec) || (gameResult == 1 && profile->totalSec == 0)){
-    profile->totalSec = totalsec;
-    leader = 1;
-  }
-  
-  string check;
-  string copy;
-
- if (profile->gameP % 3 == 1){
-    sprintf(check, "%s's Board 1:", profile->name);
-    sprintf(copy, "%s's Board 2:", profile->name);
-  }
-  else if (profile->gameP % 3 == 2){
-    sprintf(check, "%s's Board 2:", profile->name);
-    sprintf(copy, "%s's Board 3:", profile->name);
-  }
-  else if (profile->gameP % 3 == 0){
-    sprintf(check, "%s's Board 3:", profile->name);
-    sprintf(copy, "%s End", profile->name);
-
-  }
-
-  if(gameResult == 0){
-    printBoard(board, boardRows, boardCols, 0);
-    printf("You lose!\n");
-    manipulate(check, copy, board, 'L', boardRows, boardCols, profile, 1);
-  }
-  else if(gameResult == 1){
-    printBoard(board, boardRows, boardCols, 0);
-    printf("You win!\n");
-    manipulate(check, copy, board, 'W', boardRows, boardCols, profile, 1);
-  }
-  else if(gameResult == 2){
-    printBoard(board, boardRows, boardCols, 1);
-    printf("You quit the game!\n");
-    manipulate(check, copy, board, 'Q', boardRows, boardCols, profile, 1);
-  }
-
-  profileChanger(profile, gameType, difficulty, gameResult, leader);
-  printf("Press any key to continue...");
-  while(!kbhit()){
-    //
   }
 }
 
@@ -687,29 +801,102 @@ void startGame(Profile *profile) {
   Function Comments and Description
 */
 void mainMenu(Profile *profile) {
-  blank();
+  
+  
   char fileName[55];
   int userInput;
   srand(time(0));
   Profile prof = *profile;
   int stayMenu = 1;
 
+  int cursorX = 1;
+  int cursorY = 20;
+  int userChoosing = 1;
+  char userChar;
+
+  char BOLDRED[10] = "\e[1;31m";
+  char RED[10] = "\e[0;31m";
+  char BOLDYELLOW[10] = "\e[1;33m";
+  char BOLDBLUE[10] = "\e[1;34m";
+  char WHITE[10] = "\e[0;37m";
+
 
   // while(userInput != 1 && userInput != 2 && userInput != 3 && userInput != 4
   // && userInput != 5){
   while(stayMenu){
-     printf("Welcome to Minesweeper! %s\n", profile -> name);
+    system("cls");
+    
+    printf("                    %s     __,-~~/~    `---.\n", BOLDRED);
+    printf("                   %s_/_,---(      ,    )\n", BOLDRED);
+    printf("               %s__ /       %s <    /   %s)  \\___\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("  %s- ------===;;;'%s====------------------===;;;===%s----- -  -\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                  %s\\/  %s~\"~\"~\"~\"~\"~\\~\"~)~%s\"/\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                  %s(_ (   %s\\  (     >  %s  \\)\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                   %s\\_( _ %s<         %s>_>'\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                      %s~ `-i' %s::>%s|--\"\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                          %sI%s;|.|.%s|\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                         %s<|%si::|i%s|`.\n", BOLDRED, BOLDYELLOW, BOLDRED);
+    printf("                        %s(` %s^'\"`-%s' \")\n", BOLDRED, BOLDYELLOW, BOLDRED);
+
+    // Minesweeper text
+    printf("%s", BOLDYELLOW);
+    printf("        _                                                   \n");
+    printf("  /\\/\\ (_)_ __   ___  _____      _____  ___ _ __   ___ _ __ \n");
+    printf(" /    \\| | '_ \\ / _ \\/ __\\ \\ /\\ / / _ \\/ _ \\ '_ \\ / _ \\ '__|\n");
+    printf("/ /\\/\\ \\ | | | |  __/\\__ \\ V  V /  __/  __/ |_) |  __/ |   \n");
+    printf("\\/    \\/_|_| |_|\\___||___/ \\_/\\_/ \\___|\\___| .__/ \\___|_|   \n");
+    printf("                                           |_|              \n");
+
+    printf("              Welcome to Minesweeper, %s!\n", profile -> name);
+
+    printf("%s", WHITE);
+
+
     blank();
+    printf("Main Menu\n");
     printf("[1] Start Game\n");
     printf("[2] Create a Level\n");
     printf("[3] Change Profile\n");
     printf("[4] View Statistics\n");
     printf("[5] Leaderboards\n");
     printf("[6] Quit\n");
-      blank();
+    blank();
 
-    printf("Enter input: ");
-    scanf("%d", &userInput);
+    iMoveCursor(cursorX, cursorY);
+    userInput = 1;
+    userChoosing = 1;
+    while(userChoosing){
+      iMoveCursor(cursorX, cursorY);
+      userChar = getch();
+      // printf("User char: %d\n", userChar);
+      if (userChar == -32) {
+        // printf("Up, down, left, or right?");
+        userChar = getch();
+        switch (userChar) {
+        case 72: // Up arrow
+          if (userInput-1 > 0 && userInput-1 < 7) {
+            userInput--;
+            cursorY--;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        case 80: // Down arrow
+          if (userInput+1 > 0 && userInput+1 < 7) {
+            userInput++;
+            cursorY++;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        default:
+          break;
+        }
+        
+      } else if(userChar == 13){
+        userChoosing = 0;
+        cursorX--;
+        iMoveCursor(cursorX, cursorY);
+      }
+    }
 
     switch (userInput) {
     case 1:
