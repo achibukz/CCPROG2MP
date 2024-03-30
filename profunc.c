@@ -34,6 +34,14 @@ void printProfile(Profile profile) {
   printBoards(profile);
 }
 
+/*
+  printBoards()
+
+  This function gets all text from Point A = Profile.Name's Board 1: to 
+  Point B = Profile.Name End.
+
+  @param: profile - A struct Profile of the Player
+ */
 void printBoards(Profile profile) {
 
     FILE *file = fopen("prof.txt", "r");
@@ -96,6 +104,14 @@ void arrProf(string names[], int *numNames) {
 
 }
 
+/*
+  selSort()
+
+  This function sorts all the Profile Names in one Array.
+
+  @param: names[] - A string array to store all the Profile Names
+  @param: n - A integer that stores how many players do we have
+ */
 void selSort(string arr[], int n) {
     int i, j, min;
     string temp;
@@ -116,6 +132,19 @@ void selSort(string arr[], int n) {
     }
 }
 
+/*
+  profFinder()
+
+  This function stores all the Profile Names in one Array and updates a Variable
+  that stores how many Profiles do we have.
+
+  @param: arr[] - A string array that stores all the Profile Names
+  @param: name - A target string that stores what Profile are we finding
+  @param: n - A integer that stores how many players do we have
+
+  @return: found - Value to know if we found the profile that we are looking for
+
+ */
 int profFinder(string arr[], string name, int n){
   int found = 1;
   int i = 0;
@@ -137,6 +166,12 @@ int profFinder(string arr[], string name, int n){
   return found;
 }
 
+/*
+  createProfile()
+
+  This function creates a Profile and prints it on a text file.
+
+ */
 Profile createProfile() {
   Profile profileArr[20];
   int numProf = 0;
@@ -240,6 +275,14 @@ Profile createProfile() {
     return profile;
 }
 
+/*
+  viewStat()
+
+  This function finds the name of our Profile and gets the details of the profile from
+  the text file.
+
+  @param: name - A target string that stores the name of our profile.
+ */
 void viewStat(string name) {
     blank();
     printf("View Statistics\n");
@@ -276,7 +319,13 @@ void viewStat(string name) {
   mainMenu(&profile);
 }
 
-// ALPHABETICAL ORDER
+/*
+  selProfile()
+
+  This function selects what profile do we want to use and gets the values of the different
+  variables of the profile and stores it in our program.
+
+ */
 void selProfile(){
     Profile profile;
     string arr[10];
@@ -346,6 +395,14 @@ void selProfile(){
 
 }
 
+/*
+  cursorStart()
+
+  This function finds the target string and puts our invisible cursor at the string.
+
+  @param: *file - pointer FILE to access our text file.
+  @param: target - A target string that we use to find and put our cursor at.
+ */
 void cursorStart(FILE *file, string target) {
     char buffer[256]; 
     long startPos; 
@@ -362,6 +419,17 @@ void cursorStart(FILE *file, string target) {
     fseek(file, startPos - 1, SEEK_SET);
 }
 
+/*
+  profileChanger()
+
+  This function updates the variables of our Profile and updates it in our text file.
+
+  @param: *profile - a Profile pointer that stores the Profile that we are using
+  @param: type - A integer that stores what type of Game are we playing
+  @param: diff - A integer that stores the difficulty of our Game
+  @param: win - A integer that stores if We Win, Lose or Quit
+  @param: leader - A integer that stores if we will update the leaderboard scores
+ */
 void profileChanger(Profile *profile, int type, int diff, int win, int leader){
 
     if (type == 1 && diff == 1 && win == 1){
@@ -416,6 +484,13 @@ void profileChanger(Profile *profile, int type, int diff, int win, int leader){
   
 }
 
+/*
+  delProfile1()
+
+  This function deletes the profile in our prof.txt file.
+
+  @param: name - A target string that stores the name of our profile.
+ */
 void delProfile1(string name) {
     string end;
     sprintf(end, "%s End", name);
@@ -457,6 +532,13 @@ void delProfile1(string name) {
 
 }
 
+/*
+  delProfile2()
+
+  This function deletes the profile in our profNames.txt file.
+
+  @param: name - A target string that stores the name of our profile.
+ */
 void delProfile2(string name){
   FILE *fp = fopen("profNames.txt", "r");
     if (fp == NULL) {
@@ -492,6 +574,17 @@ void delProfile2(string name){
     }
 }
 
+/*
+  printBoardTex()
+
+  This function prints our board into the text file.
+
+  @param: board[][15] - a Struct Cell that stores our Board Values.
+  @param: boardRows - A integer that stores how many rows do we have.
+  @param: boardColumns - A integer that stores how many columns do we have.
+  @param: fog - A integer that stores if will we put a fog or not.
+  @param: file - pointer FILE to access our text file.
+ */
 void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
                 int fog, FILE *file){
 
@@ -534,6 +627,13 @@ void printBoardTex(struct Cell board[][15], int boardRows, int boardColumns,
 
 }
 
+/*
+  copy()
+
+  This function copies all the text that we got from the text file after the target string.
+
+  @param: target - A target string that we will use to put our cursor at.
+ */
 void copy(string target){
     string text;
 
@@ -556,6 +656,12 @@ void copy(string target){
     fclose(fp2);
 }
 
+/*
+  paste()
+
+  This function appends all the text that we get to another text file.
+
+ */
 void paste(){
     string text;
 
@@ -578,6 +684,16 @@ void paste(){
     remove("dest.txt");
 }
 
+/*
+  rewriteFile()
+
+  This function stores all the Profile Names in one Array and updates a Variable
+  that stores how many Profiles do we have.
+
+  @param: names[] - A string array to store all the Profile Names
+  @param: *numNames - A integer pointer that stores how many players do we have
+  
+ */
 void rewriteFile(FILE *sourceFile, FILE *destFile, long endPos) {
     char buffer[256];
     while (ftell(sourceFile) < endPos && fgets(buffer, sizeof(buffer), sourceFile) != NULL) {
@@ -585,8 +701,22 @@ void rewriteFile(FILE *sourceFile, FILE *destFile, long endPos) {
     }
 }
 
-void manipulate(string target, string cope, struct Cell board[][15], char state, int boardRows, int boardColumn, Profile *profile, int n){
-    copy(cope);
+/*
+  manipulate()
+
+  This function prints the board into our text file.
+
+  @param: target - The string that we will change the lines after.
+  @param: copied - The string that we will start copying.
+  @param: board[][15] - a Struct Cell that stores our Board Values.
+  @param: state - A char that stores if we Won, Lost, or Quit
+  @param: boardRows - A integer that stores how many rows do we have.
+  @param: boardColumns - A integer that stores how many columns do we have.
+  @param: *profile - a Profile pointer that stores the Profile that we are using
+
+ */
+void manipulate(string target, string copied, struct Cell board[][15], char state, int boardRows, int boardColumn, Profile *profile){
+    copy(copied);
     
     FILE *file;
 
@@ -645,6 +775,14 @@ void manipulate(string target, string cope, struct Cell board[][15], char state,
 
 }
 
+/*
+  sortProf()
+
+  This function sorts the array of Profiles by their Total Seconds/Scores.
+
+  @param: Prof[] - A string array to store all the Profile Names
+  @param: numPlay - A integer that stores how many players do we have
+ */
 void sortProf(Profile Prof[], int numPlay) {
   Profile temp;
   int i,j;
@@ -659,6 +797,13 @@ void sortProf(Profile Prof[], int numPlay) {
     }
 }
 
+/*
+  leaderBoards()
+
+  This function gets all the Profiles and their Total Seconds/Scores and stores it into an
+  array and Prints the Leaderboards.
+
+ */
 void leaderBoards(){
   FILE *file = fopen("profNames.txt", "r");
   if (file == NULL) {
@@ -690,6 +835,12 @@ void leaderBoards(){
   blank();
 }
 
+/*
+  profile_mainMenu()
+
+  This function displays the Menu for Profiles.
+
+ */
 void profile_mainMenu() {
 
   int userInput;
