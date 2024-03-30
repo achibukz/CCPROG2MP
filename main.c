@@ -636,6 +636,12 @@ void startGame(Profile *profile) {
   system("cls");
   printf("Game over!\n");
 
+  int leader = 0;
+
+  if ((gameResult == 1 && profile-> totalSec > totalsec) || (gameResult == 1 && profile->totalSec == 0)){
+    profile->totalSec = totalsec;
+    leader = 1;
+  }
   
   string check;
   string copy;
@@ -670,7 +676,7 @@ void startGame(Profile *profile) {
     manipulate(check, copy, board, 'Q', boardRows, boardCols, profile, 1);
   }
 
-  profileChanger(profile, gameType, difficulty, gameResult);
+  profileChanger(profile, gameType, difficulty, gameResult, leader);
   printf("Press any key to continue...");
   while(!kbhit()){
     //
@@ -698,7 +704,8 @@ void mainMenu(Profile *profile) {
     printf("[2] Create a Level\n");
     printf("[3] Change Profile\n");
     printf("[4] View Statistics\n");
-    printf("[5] Quit\n");
+    printf("[5] Leaderboards\n");
+    printf("[6] Quit\n");
       blank();
 
     printf("Enter input: ");
@@ -722,6 +729,9 @@ void mainMenu(Profile *profile) {
       viewStat(prof.name);
       break;
     case 5:
+      leaderBoards();
+      break;
+    case 6:
       stayMenu = 0;
       break;
     }

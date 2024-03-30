@@ -1,9 +1,14 @@
-Achi 0
-Haerin 0
-Hyein 0
-Minju 0
-Minji 0
-Wonhee 0
-Iroha 0
-Moka 0
-Hanni 0
+Haerin 10
+
+Wonhee 8
+
+Achi 9
+
+Moka 10
+
+Wonyoung 10
+Miyoung 0       
+Minju 0       
+Maya 0       
+
+Danielle 13

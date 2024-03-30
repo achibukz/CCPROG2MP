@@ -220,8 +220,7 @@ Profile createProfile() {
   }
 
   int lead = 0;
-  fprintf(fp1, "%s ", profile.name);
-  fprintf(fp1, "%d", lead);
+  fprintf(fp1, "%s %d       ", profile.name, lead);
   fprintf(fp1, "\n");
 
 
@@ -328,6 +327,19 @@ void selProfile(){
 
     fclose(file);
 
+    FILE *fp1 = fopen("profNames.txt", "r");
+    if (fp1 == NULL) {
+        printf("Error Opening File.");
+    }
+
+    while (fscanf(file, "%s %d", profile.name, &profile.totalSec) != EOF) {
+        if (strcmp(profile.name, arr[name]) == 0) {
+            break;
+        }
+    }
+
+    fclose(fp1);
+
     mainMenu(&profile);
     
 
@@ -350,7 +362,7 @@ void cursorStart(FILE *file, string target) {
     fseek(file, startPos - 1, SEEK_SET);
 }
 
-void profileChanger(Profile *profile, int type, int diff, int win){
+void profileChanger(Profile *profile, int type, int diff, int win, int leader){
 
     if (type == 1 && diff == 1 && win == 1){
         profile->wonGame[0]++;
@@ -386,16 +398,32 @@ void profileChanger(Profile *profile, int type, int diff, int win){
 
   fclose(file);
   blank();
+  
+  if (leader == 1){
+  delProfile2(profile->name);
+
+  FILE *fp1 = fopen("profNames.txt", "a");
+  if (file == NULL) {
+    printf("Error Opening File.");
+  }
+  fprintf(fp1, "\n");
+
+  fprintf(fp1, "%s %d", profile->name, profile->totalSec);
+  fprintf(fp1, "\n");
+
+  fclose(fp1);
+  }
+  
 }
 
 void delProfile1(string name) {
     string end;
     sprintf(end, "%s End", name);
     FILE *fp = fopen("prof.txt", "r");
-    FILE *tempFile = fopen("temp.txt", "w");
+    FILE *temp = fopen("temp.txt", "w");
     char buffer[1024];
 
-    if (!fp || !tempFile) {
+    if (!fp || !temp) {
         printf("Error opening file!\n");
         return;
     }
@@ -409,7 +437,7 @@ void delProfile1(string name) {
 
         // Copy the line if outside the section to remove
         if (copy) {
-            fputs(buffer, tempFile);
+            fputs(buffer, temp);
         }
 
         // Check for the end of the section to remove
@@ -419,7 +447,7 @@ void delProfile1(string name) {
     }
 
     fclose(fp);
-    fclose(tempFile);
+    fclose(temp);
 
     // Remove the original file and rename the temp file to the original file name
     remove("prof.txt");
@@ -436,8 +464,8 @@ void delProfile2(string name){
         return;
     }
 
-    FILE *tempFile = fopen("temp.txt", "w");
-    if (tempFile == NULL) {
+    FILE *temp = fopen("temp.txt", "w");
+    if (temp == NULL) {
         perror("Failed to open temporary file for writing");
         fclose(fp);
         return;
@@ -448,12 +476,12 @@ void delProfile2(string name){
         // Use strstr to find the target substring in the current line
         if (strstr(buffer, name) == NULL) {
             // If the line does not contain the target name, write it to the temp file
-            fputs(buffer, tempFile);
+            fputs(buffer, temp);
         }
     }
 
     fclose(fp);
-    fclose(tempFile);
+    fclose(temp);
 
     // Remove the original file and rename the temp file to the original file name
     remove("profNames.txt");
@@ -597,17 +625,17 @@ void manipulate(string target, string cope, struct Cell board[][15], char state,
     }
 
     // Rewrite the file, discarding lines below the inserted text
-    FILE *tempFile = fopen("temp.txt", "w");
-    if (tempFile == NULL) {
+    FILE *temp = fopen("temp.txt", "w");
+    if (temp == NULL) {
         printf("\nError opening temporary file\n");
         fclose(file);
         return;
     }
 
-    rewriteFile(file, tempFile, endPos);
+    rewriteFile(file, temp, endPos);
 
     fclose(file);
-    fclose(tempFile);
+    fclose(temp);
 
     // Replace original file with temporary file
     remove("prof.txt");
@@ -617,6 +645,50 @@ void manipulate(string target, string cope, struct Cell board[][15], char state,
 
 }
 
+void sortProf(Profile Prof[], int numPlay) {
+  Profile temp;
+  int i,j;
+    for (i = 0; i < numPlay - 1; i++) {
+        for (j = 0; j < numPlay - i - 1; j++) {
+            if (Prof[j].totalSec > Prof[j + 1].totalSec) {
+                temp = Prof[j];
+                Prof[j] = Prof[j + 1];
+                Prof[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void leaderBoards(){
+  FILE *file = fopen("profNames.txt", "r");
+  if (file == NULL) {
+    printf("Error Opening File.");
+  }
+
+  Profile prof[10];
+  int numPlayers = 0;
+
+  while (fscanf(file, "%s %d", prof[numPlayers].name, &prof[numPlayers].totalSec) == 2) {
+        numPlayers++;
+    }
+
+  fclose(file);
+
+  sortProf(prof, numPlayers);
+  blank();
+  blank();
+
+  int cnt = 1;
+  printf("Leaderboards:\n");
+    for (int i = 0; i < numPlayers; i++) {
+        if (prof[i].totalSec != 0){
+          printf("#%d: %s - Seconds Taken: %d\n",cnt, prof[i].name, prof[i].totalSec);
+          cnt++;
+        }
+    }
+
+  blank();
+}
 
 void profile_mainMenu() {
 
