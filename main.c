@@ -14,7 +14,34 @@ Acknowledgments : < list of references used in the making of this project > */
 #include <string.h>
 #include <time.h>
 
-//hi
+void printMinesweeper(){
+  char BOLDRED[10] = "\e[1;31m";
+  char RED[10] = "\e[0;31m";
+  char BOLDYELLOW[10] = "\e[1;33m";
+  char BOLDBLUE[10] = "\e[1;34m";
+  char WHITE[10] = "\e[0;37m";
+
+  printf("                    %s     __,-~~/~    `---.\n", BOLDRED);
+  printf("                   %s_/_,---(      ,    )\n", BOLDRED);
+  printf("               %s__ /       %s <    /   %s)  \\___\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("  %s- ------===;;;'%s====------------------===;;;===%s----- -  -\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                  %s\\/  %s~\"~\"~\"~\"~\"~\\~\"~)~%s\"/\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                  %s(_ (   %s\\  (     >  %s  \\)\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                   %s\\_( _ %s<         %s>_>'\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                      %s~ `-i' %s::>%s|--\"\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                          %sI%s;|.|.%s|\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                         %s<|%si::|i%s|`.\n", BOLDRED, BOLDYELLOW, BOLDRED);
+  printf("                        %s(` %s^'\"`-%s' \")\n", BOLDRED, BOLDYELLOW, BOLDRED);
+
+  // Minesweeper text
+  printf("%s", BOLDYELLOW);
+  printf("        _                                                   \n");
+  printf("  /\\/\\ (_)_ __   ___  _____      _____  ___ _ __   ___ _ __ \n");
+  printf(" /    \\| | '_ \\ / _ \\/ __\\ \\ /\\ / / _ \\/ _ \\ '_ \\ / _ \\ '__|\n");
+  printf("/ /\\/\\ \\ | | | |  __/\\__ \\ V  V /  __/  __/ |_) |  __/ |   \n");
+  printf("\\/    \\/_|_| |_|\\___||___/ \\_/\\_/ \\___|\\___| .__/ \\___|_|   \n");
+  printf("                                           |_|              \n");
+}
 
 /*
   nRandomizer() - Generates a random integer within a given range
@@ -476,7 +503,7 @@ void startGame(Profile *profile) {
   char userChar;
   char customFileName[55];
   int cursorX = 3, cursorY = 1;
-  int menuCursorX = 1, menuCursorY = 20;
+  int menuCursorX = 0, menuCursorY = 20;
 
   int i, j;
 
@@ -505,12 +532,15 @@ void startGame(Profile *profile) {
     while (!hasChosenGameType){
       hasChosenLevel = 0;
       while(!hasChosenLevel){
+        menuCursorX = 20, menuCursorY = 21;
         userChoosing = 1;
-        iClear(menuCursorX-1, menuCursorY-1, 30, 7);
-        printf("Choose a game type:\n");
-        printf("[1] Classic game\n");
-        printf("[2] Custom game\n");
-        printf("[3] Back to main menu\n");
+        iClear(0, 20, 50, 7);
+        iSetColor(I_COLOR_CYAN);
+        printf("                 Choose a game type:\n");
+        iSetColor(I_COLOR_YELLOW);
+        printf("                    1: Classic game\n");
+        printf("                    2: Custom game\n");
+        printf("                    3: Back to main menu\n");
         iMoveCursor(menuCursorX, menuCursorY);
         gameType = 1;
         while(userChoosing){
@@ -542,21 +572,24 @@ void startGame(Profile *profile) {
           } else if(userChar == 13){
             userChoosing = 0;
             menuCursorX--;
+            if(gameType == 3){ menuCursorY-=2; }
             hasChosenGameType = 1;
-            iMoveCursor(menuCursorX, menuCursorY);
           }
         }
 
         if (gameType == 1) {
+          menuCursorX = 20, menuCursorY = 21;
           difficulty = 1;
           userChoosing = 1;
          
-          iMoveCursor(1, 20);
-          iClear(menuCursorX-1, menuCursorY-1, 30, 7);
-          printf("Choose a difficulty:\n");
-          printf("[1] Easy (8 x 8 level with 10 mines)\n");
-          printf("[2] Difficult (10 x 15 level with 35 mines)\n");
-          printf("[3] Back to game types");
+          iMoveCursor(20, 21);
+          iClear(0, 20, 50, 7);
+          iSetColor(I_COLOR_CYAN);
+          printf("                  Choose a difficulty:\n");
+          iSetColor(I_COLOR_YELLOW);
+          printf("                    1: Easy (8 x 8 level with 10 mines)\n");
+          printf("                    2: Difficult (10 x 15 level with 35 mines)\n");
+          printf("                    3: Back to game types");
           while(userChoosing){
             iMoveCursor(menuCursorX, menuCursorY);
             userChar = getch();
@@ -586,6 +619,7 @@ void startGame(Profile *profile) {
           } else if(userChar == 13){
             userChoosing = 0;
             menuCursorX--;
+            if(difficulty == 3){ menuCursorY-=2; }
             hasChosenLevel = 1;
           }
         }
@@ -602,7 +636,7 @@ void startGame(Profile *profile) {
           else if (difficulty == 2) {
             boardRows = 10;
             boardCols = 15;
-            mineCount = 35;
+            mineCount = 35; 
             hasChosenLevel = 1;
             hasChosenGameType = 1;
             gameStatus++;
@@ -611,13 +645,18 @@ void startGame(Profile *profile) {
             hasChosenGameType = 0;
             hasChosenLevel = 0;
             gameType = 3;
+            iClear(0, 20, 75, 7);
+            //iMoveCursor(0, 19);
           }
         }
 
         else if (gameType == 2) {
-            iClear(menuCursorX, menuCursorY, 30, 7);
-            iMoveCursor(menuCursorX, menuCursorY);
+            iClear(0, 20, 50, 7);
+            iMoveCursor(10, 20);
+            iSetColor(I_COLOR_CYAN);
             printf("Enter B to go back to game types.\n");
+            printf("\n");
+            iSetColor(I_COLOR_YELLOW);
             printf("Enter a file name (without .txt): ");
             scanf("%s", customFileName);
             if(strcmp(customFileName, "B") == 0){
@@ -773,17 +812,17 @@ void startGame(Profile *profile) {
         if(gameResult == 0){
           printBoard(board, boardRows, boardCols, 0);
           printf("You lose!\n");
-          manipulate(check, copy, board, 'L', boardRows, boardCols, profile, 1);
+          manipulate(check, copy, board, 'L', boardRows, boardCols, profile);
         }
         else if(gameResult == 1){
           printBoard(board, boardRows, boardCols, 0);
           printf("You win!\n");
-          manipulate(check, copy, board, 'W', boardRows, boardCols, profile, 1);
+          manipulate(check, copy, board, 'W', boardRows, boardCols, profile);
         }
         else if(gameResult == 2){
           printBoard(board, boardRows, boardCols, 1);
           printf("You quit the game!\n");
-          manipulate(check, copy, board, 'Q', boardRows, boardCols, profile, 1);
+          manipulate(check, copy, board, 'Q', boardRows, boardCols, profile);
         }
 
         profileChanger(profile, gameType, difficulty, gameResult, leader);
@@ -800,7 +839,7 @@ void startGame(Profile *profile) {
 /*
   Function Comments and Description
 */
-void mainMenu(Profile *profile) {
+void mainMenu(Profile *profile, int *programRunning) {
   
   
   char fileName[55];
@@ -809,62 +848,39 @@ void mainMenu(Profile *profile) {
   Profile prof = *profile;
   int stayMenu = 1;
 
-  int cursorX = 1;
-  int cursorY = 20;
+
   int userChoosing = 1;
   char userChar;
 
-  char BOLDRED[10] = "\e[1;31m";
-  char RED[10] = "\e[0;31m";
-  char BOLDYELLOW[10] = "\e[1;33m";
-  char BOLDBLUE[10] = "\e[1;34m";
-  char WHITE[10] = "\e[0;37m";
-
-
   // while(userInput != 1 && userInput != 2 && userInput != 3 && userInput != 4
   // && userInput != 5){
-  while(stayMenu){
+  while(stayMenu && *programRunning){
+    int cursorX = 18;
+    int cursorY = 21;
     system("cls");
-    
-    printf("                    %s     __,-~~/~    `---.\n", BOLDRED);
-    printf("                   %s_/_,---(      ,    )\n", BOLDRED);
-    printf("               %s__ /       %s <    /   %s)  \\___\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("  %s- ------===;;;'%s====------------------===;;;===%s----- -  -\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                  %s\\/  %s~\"~\"~\"~\"~\"~\\~\"~)~%s\"/\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                  %s(_ (   %s\\  (     >  %s  \\)\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                   %s\\_( _ %s<         %s>_>'\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                      %s~ `-i' %s::>%s|--\"\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                          %sI%s;|.|.%s|\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                         %s<|%si::|i%s|`.\n", BOLDRED, BOLDYELLOW, BOLDRED);
-    printf("                        %s(` %s^'\"`-%s' \")\n", BOLDRED, BOLDYELLOW, BOLDRED);
-
-    // Minesweeper text
-    printf("%s", BOLDYELLOW);
-    printf("        _                                                   \n");
-    printf("  /\\/\\ (_)_ __   ___  _____      _____  ___ _ __   ___ _ __ \n");
-    printf(" /    \\| | '_ \\ / _ \\/ __\\ \\ /\\ / / _ \\/ _ \\ '_ \\ / _ \\ '__|\n");
-    printf("/ /\\/\\ \\ | | | |  __/\\__ \\ V  V /  __/  __/ |_) |  __/ |   \n");
-    printf("\\/    \\/_|_| |_|\\___||___/ \\_/\\_/ \\___|\\___| .__/ \\___|_|   \n");
-    printf("                                           |_|              \n");
-
+    blank();
+    printMinesweeper();
     printf("              Welcome to Minesweeper, %s!\n", profile -> name);
-
-    printf("%s", WHITE);
-
-
+    
+    iSetColor(I_COLOR_WHITE);
     blank();
-    printf("Main Menu\n");
-    printf("[1] Start Game\n");
-    printf("[2] Create a Level\n");
-    printf("[3] Change Profile\n");
-    printf("[4] View Statistics\n");
-    printf("[5] Leaderboards\n");
-    printf("[6] Quit\n");
+    
+    iSetColor(I_COLOR_CYAN);
+    printf("                  Main Menu\n");
+    iSetColor(I_COLOR_YELLOW);
+    printf("                  1: Start Game\n");
+    printf("                  2: Create a Level\n");
+    printf("                  3: Change Profile\n");
+    printf("                  4: View Statistics\n");
+    printf("                  5: Leaderboards\n");
+    printf("                  6: Quit\n");
     blank();
+    iSetColor(I_COLOR_WHITE);
 
-    iMoveCursor(cursorX, cursorY);
+    iMoveCursor(18, 21);
     userInput = 1;
     userChoosing = 1;
+    userChar = ' ';
     while(userChoosing){
       iMoveCursor(cursorX, cursorY);
       userChar = getch();
@@ -909,17 +925,27 @@ void mainMenu(Profile *profile) {
       writeCustomLevel(fileName);
       break;
     case 3:
-      selProfile();
+    iClear(0, 20, 75, 8);
+      selProfile(programRunning);
       break;
     case 4:
-      blank();
+      iClear(0, 20, 75, 8);
       viewStat(prof.name);
+      iSetColor(I_COLOR_YELLOW);
+      blank();
+      printf("Press any key to continue...");
+      while(!kbhit()){ /* do nothing */ }
       break;
     case 5:
+      iClear(0, 20, 75, 7);
       leaderBoards();
+      iSetColor(I_COLOR_YELLOW);
+      printf("Press any key to continue...");
+      while(!kbhit()){ /* do nothing */ }
       break;
     case 6:
       stayMenu = 0;
+      *programRunning = 0;
       break;
     }
   }
@@ -927,7 +953,8 @@ void mainMenu(Profile *profile) {
 }
 
 int main() {
-  profile_mainMenu();
+  int programRunning = 1;
+  profile_mainMenu(&programRunning);
 
   return 0;
 }

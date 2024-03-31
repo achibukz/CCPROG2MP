@@ -45,15 +45,16 @@ int profFinder(string arr[], string name, int n);
 void rewriteFile(FILE *sourceFile, FILE *destFile, long endPos);
 
 Profile createProfile();
-void selProfile();
+void selProfile(int *programRunning);
 void viewStat(string name);
 void delProfile1(string name);
 void delProfile2(string name);
 void leaderBoards();
-void mainMenu(Profile *profile);
+void mainMenu(Profile *profile, int *programRunning);
+void printMinesweeper();
 
 void profileChanger(Profile *profile, int type, int diff, int win, int leader);
-void profile_mainMenu();
+void profile_mainMenu(int *programRunning);
 
 void copy(string target);
 void paste();

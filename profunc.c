@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <conio.h>
 
 /*
   blank() - Creates a Horizontal Dash for Display.
  */
 void blank() {
-
+  iSetColor(I_COLOR_PURPLE);
   printf("---------------------------------------------------\n");
 }
 
@@ -20,15 +21,19 @@ void blank() {
   @param: profile - A struct Profile of the Player
  */
 void printProfile(Profile profile) {
+  iSetColor(I_COLOR_CYAN);
   printf("Profile Name: %s\n", profile.name);
+  iSetColor(I_COLOR_GREEN);
   printf("  Games Won:\n");
   printf("     Classic-Easy: %d\n", profile.wonGame[0]);
   printf("     Classic-Difficult: %d\n", profile.wonGame[1]);
   printf("     Custom: %d\n", profile.wonGame[2]);
+  iSetColor(I_COLOR_RED);
   printf("  Games Lost:\n");
   printf("     Classic-Easy: %d\n", profile.lostGame[0]);
   printf("     Classic-Difficult: %d\n", profile.lostGame[1]);
   printf("     Custom: %d\n", profile.lostGame[2]);
+  iSetColor(I_COLOR_YELLOW);
   printf("  Games Played: %d\n", profile.gameP - 1);
   printf("  Three Most Recent Games: \n");
   printBoards(profile);
@@ -49,6 +54,7 @@ void printBoards(Profile profile) {
     printf("Error Opening File.");
     }
     string start;
+    iSetColor(I_COLOR_CYAN);
     sprintf(start, "%s's Board 1:", profile.name);
     string check;
     sprintf(check, "%s End", profile.name);
@@ -183,7 +189,6 @@ Profile createProfile() {
   arrProf(arr, &numNames);
 
   Profile profile;
-  blank();
 
   while (check != 1) {
     printf("Profile Name (3-20 characters): ");
@@ -263,16 +268,20 @@ Profile createProfile() {
   fclose(fp1);
 
   blank();
+
+  iSetColor(I_COLOR_YELLOW);
   printf("Profile is Saved.\n");
 
   blank();
-  printProfile(profileArr[numProf]);
+  
+  //printProfile(profileArr[numProf]);
 
   numProf++;
+  iSetColor(I_COLOR_YELLOW);
+  printf("Press any key to continue...");
+  while(!kbhit()){}
 
-
-    mainMenu(&profile);
-    return profile;
+  return profile;
 }
 
 /*
@@ -284,9 +293,6 @@ Profile createProfile() {
   @param: name - A target string that stores the name of our profile.
  */
 void viewStat(string name) {
-    blank();
-    printf("View Statistics\n");
-    blank();
   int found = 0;
   Profile profile;
 
@@ -307,16 +313,15 @@ void viewStat(string name) {
   fclose(file);
 
   if (found) {
-    blank();
+    iSetColor(I_COLOR_YELLOW);
     printf("Profile found.\n");
-    blank();
+    printf("\n");
     printProfile(profile);
   } else {
-    blank();
+    iSetColor(I_COLOR_YELLOW);
     printf("Profile not found.\n");
+    printf("\n");
   }
-
-  mainMenu(&profile);
 }
 
 /*
@@ -326,39 +331,73 @@ void viewStat(string name) {
   variables of the profile and stores it in our program.
 
  */
-void selProfile(){
+void selProfile(int *programRunning){
     Profile profile;
     string arr[10];
     int name;
     int numNames, i;
     int nCheck = 0;
+    char userChar;
+    int cursorX = 20, cursorY = 21;
 
     arrProf(arr, &numNames);
-
-    printf("Select Your Profile: \n");
+    iSetColor(I_COLOR_CYAN);
+    printf("               Select Your Profile: \n");
     for (i = 0; i < numNames; i++) {
-        printf("%d: %s\n",i + 1, arr[i]);
+        iSetColor(I_COLOR_YELLOW);
+        printf("                    %d: %s\n",i + 1, arr[i]);
     }
-    
-  while (nCheck != 1){
-    printf("What profile will you use? (Select The Number) ");
-    scanf("%d", &name);
 
-    if (1 <= name && name <= numNames) {
-        blank();
-        printf("Profile found.\n");
-        blank();
-        nCheck = 1;
-    } 
-    else {
-        blank();
-        printf("Profile not found.\n");
-        printf("Please Try Again.\n");
-    }
+  name = 1;
+  userChar = ' ';
+  while (nCheck != 1){
+      iMoveCursor(cursorX, cursorY);
+      userChar = getch();
+      // printf("User char: %d\n", userChar);
+      if (userChar == -32) {
+        // printf("Up, down, left, or right?");
+        userChar = getch();
+        switch (userChar) {
+        case 72: // Up arrow
+          if (name-1 > 0 && name-1 <= numNames) {
+            name--;
+            cursorY--;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        case 80: // Down arrow
+          if (name+1 > 0 && name+1 <= numNames) {
+            name++;
+            cursorY++;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        default:
+          break;
+        }
+        
+      } else if(userChar == 13){
+        nCheck = 0;
+        cursorX--;
+        iMoveCursor(cursorX, cursorY);
+        if (1 <= name && name <= numNames) {
+            blank();
+            printf("Profile found.\n");
+            blank();
+            nCheck = 1;
+        } 
+        else {
+            blank();
+            printf("Profile not found.\n");
+            printf("Please Try Again.\n");
+        }
+      }
+    
+    
   }
 
   name -= 1;
-  nCheck = 0;
+  
 
 
     FILE *file = fopen("prof.txt", "r");
@@ -389,10 +428,7 @@ void selProfile(){
 
     fclose(fp1);
 
-    mainMenu(&profile);
-    
-
-
+  mainMenu(&profile, programRunning);
 }
 
 /*
@@ -820,14 +856,18 @@ void leaderBoards(){
   fclose(file);
 
   sortProf(prof, numPlayers);
-  blank();
-  blank();
 
   int cnt = 1;
-  printf("Leaderboards:\n");
+  iSetColor(I_COLOR_CYAN);
+  printf("                    Leaderboards\n");
     for (int i = 0; i < numPlayers; i++) {
         if (prof[i].totalSec != 0){
-          printf("#%d: %s - Seconds Taken: %d\n",cnt, prof[i].name, prof[i].totalSec);
+          iSetColor(I_COLOR_GREEN);
+          printf("          #%d: ", cnt);
+          iSetColor(I_COLOR_YELLOW);
+          printf("%s ", prof[i].name);
+          iSetColor(I_COLOR_GREEN);
+          printf("- Seconds Taken: %d\n", prof[i].totalSec);
           cnt++;
         }
     }
@@ -841,8 +881,8 @@ void leaderBoards(){
   This function displays the Menu for Profiles.
 
  */
-void profile_mainMenu() {
-
+void profile_mainMenu(int *programRunning) {
+  system("cls");
   int userInput;
   string arr[10];
   int numNames;
@@ -850,42 +890,94 @@ void profile_mainMenu() {
   char con;
   string name;
   int i;
+  int cursorX = 20, cursorY = 21;
+  int userChoosing;
+  char userChar;
 
   arrProf(arr, &numNames);
-    
+  iSetColor(I_COLOR_PURPLE);
   blank();
-  printf("1: Create Profile\n");
-  printf("2: Select Existing Profile\n");
-  printf("3: Delete Existing Profile\n");
-  printf("What is your Choice: ");
-  scanf("%d", &userInput);
-  getchar();
+  printMinesweeper();
+  printf("\n");
+  blank();
+  iSetColor(I_COLOR_CYAN);
+  printf("                    Choose a profile:\n");
+  iSetColor(I_COLOR_YELLOW);
+  printf("                    1: Create Profile\n");
+  printf("                    2: Select Existing Profile\n");
+  printf("                    3: Delete Existing Profile\n");
+
+  iMoveCursor(18, 21);
+  userInput = 1;
+  userChoosing = 1;
+  userChar = ' ';
+  while(userChoosing){
+      iMoveCursor(cursorX, cursorY);
+      userChar = getch();
+      // printf("User char: %d\n", userChar);
+      if (userChar == -32) {
+        // printf("Up, down, left, or right?");
+        userChar = getch();
+        switch (userChar) {
+        case 72: // Up arrow
+          if (userInput-1 > 0 && userInput-1 < 4) {
+            userInput--;
+            cursorY--;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        case 80: // Down arrow
+          if (userInput+1 > 0 && userInput+1 < 4) {
+            userInput++;
+            cursorY++;
+            iMoveCursor(cursorX, cursorY);
+          }
+          break;
+        default:
+          break;
+        }
+        
+      } else if(userChar == 13){
+        userChoosing = 0;
+        cursorX--;
+        iMoveCursor(cursorX, cursorY);
+      }
+    }
 
   switch (userInput) {
   case 1:
     if (numNames == 10){
-      printf("The Program has reached the Maximum of 10 Profiles.\n");
-      printf("Please select an existing profile or Delete a Profile\n");
-      profile_mainMenu();
+      iClear(0, 20, 75, 7);
+      iSetColor(I_COLOR_YELLOW);
+      printf("The program has reached the maximum of 10 profiles.\n");
+      printf("Please select an existing profile or delete a profile\n");
+      printf("Press any key to continue...");
+      while(!kbhit()){}
+      profile_mainMenu(programRunning);
     }
     else{
+      iClear(0, 20, 75, 7);
       createProfile();
-      break;
+      profile_mainMenu(programRunning);
+      
     }
-    
+    break;
   case 2:
-    selProfile();
+    iClear(0, 20, 75, 7);
+    selProfile(programRunning);
     break;
   case 3:
-    printf("Select Your Profile: \n");
+    iClear(0, 20, 75, 7);
+    printf("                    Select Your Profile: \n");
     for (i = 0; i < numNames; i++) {
-        printf("%d: %s\n",i + 1, arr[i]);
+        printf("                    %d: %s\n",i + 1, arr[i]);
     }
     blank();
     printf("Who do you want to delete (Type the Name): ");
     scanf("%s", name);
     
-    check = profFinder(arr, name, numNames);
+    check = profFinder(arr, name, numNames); 
+
 
     if(check == 0){
       printf("Profile is Found\n");
@@ -896,12 +988,12 @@ void profile_mainMenu() {
         blank();
         delProfile1(name);
         delProfile2(name);
-        profile_mainMenu();
+        profile_mainMenu(programRunning);
 
       }
       else{
         blank();
-        profile_mainMenu();
+        profile_mainMenu(programRunning);
       }
     }
     break;
