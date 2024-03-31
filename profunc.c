@@ -962,12 +962,12 @@ void profile_mainMenu(int *programRunning) {
       printf("Press any key to continue...");
       while(!kbhit()){}
       profile_mainMenu(programRunning);
+
     }
     else{
       iClear(0, 20, 75, 7);
-      createProfile();
-      profile_mainMenu(programRunning);
-      
+      Profile createdProfile = createProfile();
+      mainMenu(&createdProfile, programRunning);
     }
     break;
   case 2:
