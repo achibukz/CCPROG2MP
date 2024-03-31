@@ -307,7 +307,6 @@ void viewStat(string name) {
                 &profile.lostGame[1], &profile.lostGame[2], &profile.gameP);
     if (strcmp(profile.name, name) == 0) {
       found = 1;
-      // break;
     }
   }while(var != EOF && found != 1);
 
@@ -413,7 +412,6 @@ void selProfile(int *programRunning){
                 &profile.lostGame[1], &profile.lostGame[2], &profile.gameP);
       if (strcmp(profile.name, arr[name]) == 0) {
             found = 1;
-            //break;
         }
 
     }while(var1 != EOF && found != 1);
@@ -431,7 +429,6 @@ void selProfile(int *programRunning){
       var2 = fscanf(file, "%s %d", profile.name, &profile.totalSec);
       if (strcmp(profile.name, arr[name]) == 0) {
             found = 1;
-            // break;
         }
     }while(var2 != EOF && found != 1);
 
@@ -453,26 +450,13 @@ void cursorStart(FILE *file, string target) {
     long startPos; 
 
     rewind(file);
+
     int found = 0;
-    char *var;
 
-        
-    /*
-    do{
-      var = fgets(buffer, sizeof(buffer), file);
-
+    while (fgets(buffer, sizeof(buffer), file) != NULL && found == 0){
       if (strstr(buffer, target) != NULL) {
             startPos = ftell(file) - strlen(buffer);
-            //break;
-        }
-
-    }while(var != NULL && found != 1);
-    */
-
-    while (fgets(buffer, sizeof(buffer), file) != NULL){
-      if (strstr(buffer, target) != NULL) {
-            startPos = ftell(file) - strlen(buffer);
-            break;
+            found = 1;
         }
     }
 
