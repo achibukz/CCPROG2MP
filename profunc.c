@@ -298,14 +298,18 @@ void viewStat(string name) {
     printf("Error Opening File.");
   }
 
-  while (fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
+
+  int var;
+
+  do{
+    var = fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
                 &profile.wonGame[1], &profile.wonGame[2], &profile.lostGame[0],
-                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP) != EOF) {
+                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP);
     if (strcmp(profile.name, name) == 0) {
       found = 1;
-      break;
+      // break;
     }
-  }
+  }while(var != EOF && found != 1);
 
   fclose(file);
 
@@ -395,33 +399,41 @@ void selProfile(int *programRunning){
 
   name -= 1;
   
-
-
+    int found = 0;
+    int var1, var2;
     FILE *file = fopen("prof.txt", "r");
     if (file == NULL) {
         printf("Error Opening File.");
     }
 
-    while (fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
+
+    do{
+      var1 = fscanf(file, "%s %d %d %d %d %d %d %d", profile.name, &profile.wonGame[0],
                 &profile.wonGame[1], &profile.wonGame[2], &profile.lostGame[0],
-                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP) != EOF) {
-        if (strcmp(profile.name, arr[name]) == 0) {
-            break;
+                &profile.lostGame[1], &profile.lostGame[2], &profile.gameP);
+      if (strcmp(profile.name, arr[name]) == 0) {
+            found = 1;
+            //break;
         }
-    }
+
+    }while(var1 != EOF && found != 1);
 
     fclose(file);
 
+    found = 0;
     FILE *fp1 = fopen("profNames.txt", "r");
     if (fp1 == NULL) {
         printf("Error Opening File.");
     }
 
-    while (fscanf(file, "%s %d", profile.name, &profile.totalSec) != EOF) {
-        if (strcmp(profile.name, arr[name]) == 0) {
-            break;
+
+    do{
+      var2 = fscanf(file, "%s %d", profile.name, &profile.totalSec);
+      if (strcmp(profile.name, arr[name]) == 0) {
+            found = 1;
+            // break;
         }
-    }
+    }while(var2 != EOF && found != 1);
 
     fclose(fp1);
 
@@ -441,13 +453,20 @@ void cursorStart(FILE *file, string target) {
     long startPos; 
 
     rewind(file);
+    int found = 0;
+    char *var;
 
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        if (strstr(buffer, target) != NULL) {
+        
+
+    do{
+      var = fgets(buffer, sizeof(buffer), file);
+
+      if (strstr(buffer, target) != NULL) {
             startPos = ftell(file) - strlen(buffer);
-            break;
+            //break;
         }
-    }
+
+    }while(var != NULL && found != 1);
 
     fseek(file, startPos - 1, SEEK_SET);
 }
