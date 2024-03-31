@@ -179,7 +179,7 @@ int profFinder(string arr[], string name, int n){
 
  */
 Profile createProfile() {
-  Profile profileArr[20];
+  //Profile profileArr[20];
   int numProf = 0;
   int check = 0;
   int numNames;
@@ -195,7 +195,6 @@ Profile createProfile() {
     scanf("%s", profile.name);
 
     nCheck = profFinder(arr, profile.name, numNames);
-    printf("%d\n", nCheck);
 
     if (strlen(profile.name) >= 3 && strlen(profile.name) <= 20 && nCheck == 1) {
       printf("Valid Profile Name. Thank you!\n");
@@ -223,7 +222,7 @@ Profile createProfile() {
 
   profile.gameP = 1;
 
-  profileArr[numProf] = profile;
+  //profileArr[numProf] = profile;
 
   FILE *file = fopen("prof.txt", "a");
   if (file == NULL) {
@@ -266,8 +265,6 @@ Profile createProfile() {
 
 
   fclose(fp1);
-
-  blank();
 
   iSetColor(I_COLOR_YELLOW);
   printf("Profile is Saved.\n");

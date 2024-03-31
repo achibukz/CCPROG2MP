@@ -1,11 +1,10 @@
 /*
-Description : < describe what this program does briefly >
-Author : Bukuhan, Abram Aki R. && Gemal, Ryan
+Description : Minesweeper Game
+Author : Bukuhan, Abram Aki R. && Gemal, Ryan June
 Section : S17A
-Last Modified : 1/29/2024
+Last Modified : 03/31/2024
 Acknowledgments : < list of references used in the making of this project > */
 
-//#include "profilesFunc.h"
 #include "interface.c"
 #include "profunc.c"
 #include <conio.h>
@@ -14,12 +13,12 @@ Acknowledgments : < list of references used in the making of this project > */
 #include <string.h>
 #include <time.h>
 
+/*
+  printMinesweeper() - This function prints the minesweeper logo and text.
+*/
 void printMinesweeper(){
   char BOLDRED[10] = "\e[1;31m";
-  char RED[10] = "\e[0;31m";
   char BOLDYELLOW[10] = "\e[1;33m";
-  char BOLDBLUE[10] = "\e[1;34m";
-  char WHITE[10] = "\e[0;37m";
 
   printf("                    %s     __,-~~/~    `---.\n", BOLDRED);
   printf("                   %s_/_,---(      ,    )\n", BOLDRED);
@@ -64,10 +63,22 @@ int nRandomizer(int nLower, int nUpper) {
   return nRand;
 }
 
+/*
+  createMine() - This function sets a board cell's isMine state to true
+
+  @param: board - The struct Cell 2D array of the game board.
+  @param: mine - The coordinates of the mine
+*/
 void createMine(struct Cell board[][15], struct CoordTag mine) {
   board[mine.xCoord][mine.yCoord].state.isMine = 1;
 }
 
+/*
+  generateRandomMine() - Generates a random mine using nRandomizer(). It makes sure that the generated mine is within the game's board.
+
+  @param: boardRows - The number of rows in the board.
+  @param: boardCols - The number of cols in the board.
+*/
 struct CoordTag generateRandomMine(int boardRows, int boardCols) {
   struct CoordTag randomMine;
 
@@ -77,6 +88,14 @@ struct CoordTag generateRandomMine(int boardRows, int boardCols) {
   return randomMine;
 }
 
+/*
+  generateMineExcept() - Generates a random mine using nRandomizer(). It makes sure that the generated mine is within the game's board, 
+                        as well as make sure that the generated mine is not in conflict with the given exceptCell.
+
+    @param: boardRows - The number of rows in the board.
+    @param: boardCols - The number of columns in the board.
+    @param: exceptCell - The cell to not be in conflict with the generated mine.
+*/
 struct CoordTag generateMineExcept(int boardRows, int boardCols,
                                    struct CoordTag exceptCell) {
   struct CoordTag randomMine;
@@ -93,10 +112,25 @@ struct CoordTag generateMineExcept(int boardRows, int boardCols,
   return randomMine;
 }
 
+/*
+  isPosMatch() - Checks if the coordinates of cellA matches the coordinates of cellB.
+
+  @param: cellA - First cell to be compared with
+  @param: cellB - Second cell to be compared with
+*/
 int isPosMatch(struct CoordTag cellA, struct CoordTag cellB) {
   return cellA.xCoord == cellB.xCoord && cellA.yCoord == cellB.yCoord;
 }
 
+/*
+  initializeMines() - Initializes the board with mines by randomly generating according to the mineCount, and makes sure that the generated mine does not conflict with userCell.
+
+  @param: board - The game board to be edited
+  @param: mineCount - The total number of mines to be generated
+  @param: boardRows - The number of rows in the board.
+  @param: boardCols - The number of columns in the board.
+  @param: userCell - The first cell to be checked by the player.
+*/
 void initializeMines(struct Cell board[][15], int mineCount, int boardRows,
                      int boardCols, struct CoordTag userCell) {
   int i, j, k;
@@ -115,7 +149,6 @@ void initializeMines(struct Cell board[][15], int mineCount, int boardRows,
   int hasConflict;
 
   for (i = 0; i < mineCount; i++) {
-    // mines[i] = generateRandomMine(boardRows, boardCols);
     tempMine = generateRandomMine(boardRows, boardCols);
     hasConflict = 0;
 
@@ -168,6 +201,16 @@ void initializeMines(struct Cell board[][15], int mineCount, int boardRows,
   }
 }
 
+/*
+  checkAdjacentMines() - Checks the adjacent mines of the given target cell and returns the number of mines found.
+  
+  @param: board - The game board to be checked
+  @param: boardRows - The number of rows in the board.
+  @param: boardCols - The number of columns in the board.
+  @param: targetCell - The first cell whose adjacent mines is to be checked.
+
+  @return: An integer value that returns the number of mines adjacent to the target cell.
+*/
 int checkAdjacentMines(struct Cell board[][15], int boardRows, int boardCols,
                        struct CoordTag targetCell) {
   int count = 0;
@@ -192,10 +235,25 @@ int checkAdjacentMines(struct Cell board[][15], int boardRows, int boardCols,
   return count;
 }
 
+/*
+  isMine() - Checks if the given target cell is a mine.
+
+  @param: board - The game board to be checked
+  @param: targetCell - The cell to be checked
+
+  @return: 1 if targetCell is a mine.
+           0 if targetCell is not a mine.
+*/
 int isMine(struct Cell board[][15], struct CoordTag targetCell) {
   return board[targetCell.xCoord][targetCell.yCoord].state.isMine;
 }
 
+/*
+  inspect() - Checks if the targetCell is a mine or not. If the targetCell is a flag, it disabled the flag state, and checks the targetCell if there are no surrounding mines. 
+              It then repeats this along its adjacent cells until it hits a non-zero value. Afterwards, it turns the state of the inspected cells into isRevealed.
+
+  @return: 0 if game continues, 1 if game over.
+*/
 int inspect(struct Cell board[][15], int boardRows, int boardCols,
             struct CoordTag targetCell) {
   int adjacentMines =
@@ -233,6 +291,12 @@ int inspect(struct Cell board[][15], int boardRows, int boardCols,
   }
 }
 
+/*
+  flag() - Checks if the targetCell is not yet revealed, then toggles the state of the targetCell's isFlagged state.
+  
+  @param: board - The board to be checked
+  @param: targetCell - The target cell to be flagged
+*/
 void flag(struct Cell board[][15], struct CoordTag targetCell) {
   if (board[targetCell.xCoord][targetCell.yCoord].state.isRevealed == 0) {
     if (board[targetCell.xCoord][targetCell.yCoord].state.isFlagged == 0) {
@@ -244,7 +308,14 @@ void flag(struct Cell board[][15], struct CoordTag targetCell) {
 }
 
 /*
-  Function Comments and Description
+  printBoard() - Prints the board by checking each cell for the isFlagged, isMine, and isRevealed value. If the fog is turned on, you cannot see mines. 
+                 Otherwise, you will be able to see mines and correctly flagged mines.
+
+  @param: board - The board to be displayed
+  @param: boardRows - The number of rows in the board
+  @param: boardColumns - The number of columns in the board
+  @param: fog - 0 => You will be able to see mines and correctly flagged mines
+                1 => You will not be able to see mines
 */
 void printBoard(struct Cell board[][15], int boardRows, int boardColumns,
                 int fog) {
@@ -294,6 +365,17 @@ void printBoard(struct Cell board[][15], int boardRows, int boardColumns,
   }
 }
 
+/*
+  readCustomLevel() - Reads a custom level from a text file and transfers it to the game board. Saves the custom levels into a "levels" folder.
+  
+  @param: fileName - File name of the custom level to be read
+  @param: board - The game board to be used
+  @param: *boardRows - The number of rows in the board
+  @param: *boardCols - The number of columns in the board
+  @param: *mineCount - The number of mines in the board
+
+  @return: 1 if failed to read, 0 if read successfully.
+*/
 int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
                     int *boardCols, int *mineCount) {
   int i, j;
@@ -312,7 +394,6 @@ int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
   printf("Rows: %d, Cols: %d\n", *boardRows, *boardCols);
   for (i = 0; i < *boardRows; i++) {
     fscanf(fp, "%s", currentLine);
-    // printf("%c\n", currentLine);
     for (j = 0; j < *boardCols; j++) {
       if (currentLine[j] == 'X') {
         board[i][j].state.isMine = 1;
@@ -325,6 +406,14 @@ int readCustomLevel(char fileName[], struct Cell board[][15], int *boardRows,
   return 0;   // Return 0 to indicate success
 }
 
+/*
+  writeCustomLevel - Opens a level editor where you can make custom levels with a UI. It then stores the custom level in a "levels" directory.
+
+  @param: fileName - The file name of the desired custom level.
+
+  @return: 0 => Written successfully
+           1 => File already exists
+*/
 int writeCustomLevel(char fileName[]) {
   int i, j;
   int boardRows, boardCols;
@@ -383,7 +472,6 @@ int writeCustomLevel(char fileName[]) {
   while (!levelIsValid) {
     while (makingLevel) {
       userChoosing = 1;
-      //iClear(0, 0, 50, 50);
       system("cls");
       printBoard(board, boardRows, boardCols, 0);
       printf("Press an arrow key to move.\n");
@@ -393,9 +481,7 @@ int writeCustomLevel(char fileName[]) {
       iMoveCursor(cursorX, cursorY);
       if (userChoosing) {
         userChar = getch();
-        // printf("User char: %d\n", userChar);
         if (userChar == -32) {
-          // printf("Up, down, left, or right?");
           userChar = getch();
           switch (userChar) {
           case 75: // Left arrow
@@ -435,8 +521,6 @@ int writeCustomLevel(char fileName[]) {
             board[userCell.xCoord][userCell.yCoord].state.isMine = 1;
             userMinesPlaced++;
           }
-          // userCell.xCoord = 0;
-          // userCell.yCoord = 0;
           userChoosing = 0;
           userChar = ' ';
         } else if (userChar == 'S' || userChar == 's') {
@@ -485,7 +569,9 @@ int writeCustomLevel(char fileName[]) {
 }
 
 /*
-  Function Comments and Description
+  startGame() - Starts the game proper. Once the game ends, the statistics are then saved into the given profile.
+
+  @param: *profile - The profile whose statistics is to be saved onto
 */
 void startGame(Profile *profile) {
   int gameType = 1;
@@ -546,9 +632,7 @@ void startGame(Profile *profile) {
         while(userChoosing){
           iMoveCursor(menuCursorX, menuCursorY);
           userChar = getch();
-          // printf("User char: %d\n", userChar);
           if (userChar == -32) {
-            // printf("Up, down, left, or right?");
             userChar = getch();
             switch (userChar) {
             case 72: // Up arrow
@@ -593,9 +677,7 @@ void startGame(Profile *profile) {
           while(userChoosing){
             iMoveCursor(menuCursorX, menuCursorY);
             userChar = getch();
-            // printf("User char: %d\n", userChar);
             if (userChar == -32) {
-              // printf("Up, down, left, or right?");
               userChar = getch();
               switch (userChar) {
               case 72: // Up arrow
@@ -646,7 +728,6 @@ void startGame(Profile *profile) {
             hasChosenLevel = 0;
             gameType = 3;
             iClear(0, 20, 75, 7);
-            //iMoveCursor(0, 19);
           }
         }
 
@@ -680,13 +761,10 @@ void startGame(Profile *profile) {
       }
 
       while (gameStatus) {
-        // cursorX = 2;
-        // cursorY = 1;
         userChoosing = 1;
         flagCount = 0;
         revealCount = 0;
 
-        //iClear(0, 0, 50, 50);
         system("cls");
         printBoard(board, boardRows, boardCols, 1);
         printf("Press an arrow key to move.\n");
@@ -701,9 +779,7 @@ void startGame(Profile *profile) {
         iMoveCursor(cursorX, cursorY);
         if(kbhit() && userChoosing) {
           userChar = getch();
-          // printf("User char: %d\n", userChar);
           if (userChar == -32) {
-            // printf("Up, down, left, or right?");
             userChar = getch();
             switch (userChar) {
             case 75: // Left arrow
@@ -751,8 +827,6 @@ void startGame(Profile *profile) {
               flag(board, userCell);
               turnCount++;
             }
-            // userCell.xCoord = 0;
-            // userCell.yCoord = 0;
             userChar = ' ';
           } else if (userChar == 'Q' || userChar == 'q') {
             userChoosing = 0;
@@ -781,7 +855,6 @@ void startGame(Profile *profile) {
       }
 
       if(gameType != 3){
-        //iClear(0, 0, 50, 50);
         system("cls");
         printf("Game over!\n");
 
@@ -837,7 +910,10 @@ void startGame(Profile *profile) {
 }
 
 /*
-  Function Comments and Description
+  mainMenu() - Opens the main menu.
+
+  @param: *profile - The profile whose game and statistics is to be saved onto
+  @param: *programRunning - Tells the program to stop once it becomes 0
 */
 void mainMenu(Profile *profile, int *programRunning) {
   
@@ -852,8 +928,6 @@ void mainMenu(Profile *profile, int *programRunning) {
   int userChoosing = 1;
   char userChar;
 
-  // while(userInput != 1 && userInput != 2 && userInput != 3 && userInput != 4
-  // && userInput != 5){
   while(stayMenu && *programRunning){
     int cursorX = 18;
     int cursorY = 21;
@@ -884,9 +958,7 @@ void mainMenu(Profile *profile, int *programRunning) {
     while(userChoosing){
       iMoveCursor(cursorX, cursorY);
       userChar = getch();
-      // printf("User char: %d\n", userChar);
       if (userChar == -32) {
-        // printf("Up, down, left, or right?");
         userChar = getch();
         switch (userChar) {
         case 72: // Up arrow
@@ -949,7 +1021,6 @@ void mainMenu(Profile *profile, int *programRunning) {
       break;
     }
   }
-  //}
 }
 
 int main() {
@@ -965,6 +1036,6 @@ efforts in studying and applying the concepts learned . I have constructed the
 functions and their respective algorithms and corresponding code by myself . The
 program was run , tested , and debugged by my own efforts . I further certify
 that I have not copied in part or whole or otherwise plagiarized the work of
-other students and / or persons . Bukuhan, Abram Aki R. && Gemal, Ryan, DLSU ID
+other students and / or persons . Bukuhan, Abram Aki R. && Gemal, Ryan June, DLSU ID
 # 12313467 && 12338737
 */
