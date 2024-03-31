@@ -457,7 +457,7 @@ void cursorStart(FILE *file, string target) {
     char *var;
 
         
-
+    /*
     do{
       var = fgets(buffer, sizeof(buffer), file);
 
@@ -467,6 +467,14 @@ void cursorStart(FILE *file, string target) {
         }
 
     }while(var != NULL && found != 1);
+    */
+
+    while (fgets(buffer, sizeof(buffer), file) != NULL){
+      if (strstr(buffer, target) != NULL) {
+            startPos = ftell(file) - strlen(buffer);
+            break;
+        }
+    }
 
     fseek(file, startPos - 1, SEEK_SET);
 }

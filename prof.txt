@@ -5,6 +5,20 @@ Hyein's Board 3:
 
 Hyein End
 
+Minju 0 0 0 0 0 0 1 
+Minju's Board 1: 
+Minju's Board 2: 
+Minju's Board 3: 
+
+Minju End
+
+Haerin 0 0 0 0 0 0 1 
+Haerin's Board 1: 
+Haerin's Board 2: 
+Haerin's Board 3: 
+
+Haerin End
+
 Wonhee 0 0 0 0 0 0 1 
 Wonhee's Board 1: 
 Wonhee's Board 2: 
@@ -12,30 +26,10 @@ Wonhee's Board 3:
 
 Wonhee End
 
+Atlas 0 0 0 0 0 0 1 
+Atlas's Board 1: 
+Atlas's Board 2: 
+Atlas's Board 3: 
 
-Minju 0 0 1 1 0 0 3 
-Minju's Board 1:
-L 8 8
-   0  1  2  3  4  5  6  7 
-0  0  0  0  0  0  1  .  X  
-1  0  0  0  0  0  1  X  .  
-2  1  1  1  1  1  .  .  X  
-3  X  2  2  X  .  .  .  .  
-4  X  .  .  X  .  .  .  .  
-5  .  .  .  .  .  .  .  .  
-6  .  .  .  .  .  .  .  .  
-7  .  X  .  X  .  X  .  .  
-
-Minju's Board 2:
-W 5 5
-   0  1  2  3  4 
-0  1  1  1  0  0  
-1  1  !  1  0  0  
-2  1  1  1  0  0  
-3  0  0  0  0  0  
-4  0  0  0  0  0  
-
-Minju's Board 3: 
-
-Minju End
+Atlas End
 
